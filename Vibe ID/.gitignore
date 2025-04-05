@@ -1,0 +1,42 @@
+# Swift Package Manager
+/.build/
+/Packages/
+/*.xcodeproj
+/*.xcworkspace
+xcuserdata/
+DerivedData/
+*.moved-aside
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Carthage
+Carthage/Build
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Secrets - Ne jamais commiter de clés API directement !
+# (Bien que la clé AudD soit gérée par Keychain, c'est une bonne pratique)
+# *.secret
+# .env
+
+# Build Artifacts
+build/
+DerivedData/
+
+# User Data
+*.xcuserstate
