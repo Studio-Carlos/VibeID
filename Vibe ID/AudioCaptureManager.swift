@@ -55,10 +55,35 @@ class AudioCaptureManager: ObservableObject {
         print("AudioCaptureManager: Configuration AVAudioSession...")
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.record, mode: .measurement, options: [.duckOthers])
-            print("AudioCaptureManager: AVAudioSession configurée.")
+            // Demander les permissions d'enregistrement (important pour iOS)
+            try session.setCategory(.record, mode: .default, options: [.duckOthers])
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+            
+            // Vérifier que l'app a la permission d'enregistrer
+            switch session.recordPermission {
+            case .granted:
+                print("AudioCaptureManager: Permission d'enregistrement accordée")
+            case .denied:
+                print("AudioCaptureManager: ERREUR - Permission d'enregistrement refusée par l'utilisateur")
+            case .undetermined:
+                print("AudioCaptureManager: Permission d'enregistrement non déterminée, demande en cours...")
+                // Demander la permission (sera affichée à l'utilisateur)
+                session.requestRecordPermission { granted in
+                    DispatchQueue.main.async {
+                        if granted {
+                            print("AudioCaptureManager: Permission d'enregistrement accordée par l'utilisateur")
+                        } else {
+                            print("AudioCaptureManager: ERREUR - Permission d'enregistrement refusée par l'utilisateur")
+                        }
+                    }
+                }
+            @unknown default:
+                print("AudioCaptureManager: ERREUR - État de permission d'enregistrement inconnu")
+            }
+            
+            print("AudioCaptureManager: AVAudioSession configurée avec succès. Format d'entrée: \(session.inputDataSource?.description ?? "Inconnu")")
         } catch let error {
-            print("AudioCaptureManager: ERREUR configuration AVAudioSession: \(error)")
+            print("AudioCaptureManager: ERREUR configuration AVAudioSession: \(error.localizedDescription)")
         }
     }
 
@@ -76,16 +101,18 @@ class AudioCaptureManager: ObservableObject {
 
     /// Enregistre un court extrait audio dans un fichier temporaire.
     func recordSnippet(completion: @escaping (Result<URL, Error>) -> Void) {
+        print("AudioCaptureManager: Démarrage recordSnippet...")
+        
         guard !isRecording else {
+            print("AudioCaptureManager: ERREUR - Déjà en enregistrement")
             completion(.failure(AudioCaptureError.alreadyRecording))
             return
         }
         guard let tapFormat = self.tapFormat else {
+             print("AudioCaptureManager: ERREUR - Format de tap invalide ou nil")
              completion(.failure(AudioCaptureError.audioEngineError("Format de tap invalide")))
              return
         }
-
-        // --- SUPPRESSION de l'appel cleanupInternalState(cancelWorkItem: true) ici ---
 
         recordingCompletionHandler = completion // Stocker le nouveau handler
         outputFileURL = nil // S'assurer que l'URL est nulle au début
@@ -93,8 +120,13 @@ class AudioCaptureManager: ObservableObject {
         print("AudioCaptureManager: Début enregistrement snippet (\(snippetDuration)s)...")
 
         // Activer session audio
-        do { try AVAudioSession.sharedInstance().setActive(true) } catch {
-            cleanupRecording(error: AudioCaptureError.audioSessionConfigError(error)); return
+        do { 
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("AudioCaptureManager: Session audio activée") 
+        } catch {
+            print("AudioCaptureManager: ERREUR activation session audio: \(error.localizedDescription)")
+            cleanupRecording(error: AudioCaptureError.audioSessionConfigError(error))
+            return
         }
 
         // Définir URL et format sortie
@@ -110,32 +142,47 @@ class AudioCaptureManager: ObservableObject {
             AVNumberOfChannelsKey: tapFormat.channelCount,
             AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue
         ]
+        print("AudioCaptureManager: Format d'enregistrement - Fréquence: \(tapFormat.sampleRate)Hz, Canaux: \(tapFormat.channelCount)")
 
         // Créer AVAudioFile
         do {
             audioFile = try AVAudioFile(forWriting: currentOutputURL, settings: outputSettings, commonFormat: tapFormat.commonFormat, interleaved: tapFormat.isInterleaved)
+            print("AudioCaptureManager: Fichier audio créé")
         } catch let error {
-            cleanupRecording(error: AudioCaptureError.fileCreationError(error)); return
+            print("AudioCaptureManager: ERREUR création fichier audio: \(error.localizedDescription)")
+            cleanupRecording(error: AudioCaptureError.fileCreationError(error))
+            return
         }
 
         // Installer Tap
+        print("AudioCaptureManager: Installation du tap sur inputNode...")
         let inputNode = audioEngine.inputNode
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: tapFormat) { [weak self] buffer, time in
             guard let self = self, let audioFile = self.audioFile, self.isRecording else { return }
-            do { try audioFile.write(from: buffer) } catch let error {
+            do { 
+                try audioFile.write(from: buffer)
+            } catch let error {
                  DispatchQueue.main.async {
-                     print("AudioCaptureManager: ERREUR ÉCRITURE AUDIO FILE: \(error)")
+                     print("AudioCaptureManager: ERREUR ÉCRITURE AUDIO FILE: \(error.localizedDescription)")
                      self.cleanupRecording(error: AudioCaptureError.fileWriteError(error))
                  }
             }
         }
+        print("AudioCaptureManager: Tap installé avec succès")
 
         // Préparer et démarrer moteur
         do {
-            if audioEngine.isRunning { audioEngine.stop() } // Sécurité
+            if audioEngine.isRunning { 
+                print("AudioCaptureManager: Arrêt du moteur audio précédent")
+                audioEngine.stop() 
+            }
+            
+            print("AudioCaptureManager: Préparation du moteur audio...")
             audioEngine.prepare()
+            
+            print("AudioCaptureManager: Démarrage du moteur audio...")
             try audioEngine.start()
-            print("AudioCaptureManager: Audio Engine démarré.")
+            print("AudioCaptureManager: Audio Engine démarré avec succès.")
 
             // Planifier l'arrêt
             let workItem = DispatchWorkItem { [weak self] in
@@ -147,10 +194,13 @@ class AudioCaptureManager: ObservableObject {
                  }
             }
             stopWorkItem = workItem
+            print("AudioCaptureManager: Planification de l'arrêt dans \(snippetDuration) secondes")
             DispatchQueue.main.asyncAfter(deadline: .now() + snippetDuration, execute: workItem)
 
         } catch let error {
-            cleanupRecording(error: AudioCaptureError.audioEngineError(error.localizedDescription)); return
+            print("AudioCaptureManager: ERREUR démarrage moteur audio: \(error.localizedDescription)")
+            cleanupRecording(error: AudioCaptureError.audioEngineError(error.localizedDescription))
+            return
         }
     } // Fin func recordSnippet
 

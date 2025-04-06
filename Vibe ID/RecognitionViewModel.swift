@@ -44,7 +44,6 @@ class RecognitionViewModel: ObservableObject {
         }
 
         let shouldStartListening = !isListening
-        // isListening = shouldStartListening // Déplacé après le guard API Key
 
         if shouldStartListening { // === TENTATIVE DE DÉMARRAGE ===
             print("--- Début du bloc de DÉMARRAGE ---")
@@ -52,7 +51,6 @@ class RecognitionViewModel: ObservableObject {
             guard settingsManager.isApiKeySet else {
                 statusMessage = "Erreur: Clé API AudD manquante."
                 print(">>> ÉCHEC DÉMARRAGE: Clé API manquante ou vide.")
-                // isListening reste false
                 return
             }
 
@@ -61,22 +59,14 @@ class RecognitionViewModel: ObservableObject {
             statusMessage = "Écoute en cours..."
             print("Toggle Listening: isListening mis à \(isListening)")
 
-            // *** Utiliser Task @MainActor pour planifier les appels suivants ***
-            Task { @MainActor [weak self] in // Utiliser weak self pour éviter cycle de rétention
-                 print("--- Exécution du bloc Task @MainActor ---") // DEBUG PRINT
-                 // Revérifier self et isListening car la tâche est asynchrone
-                 guard let self = self, self.isListening else {
-                     print("Task @MainActor: N'écoute plus ou self est nil, abandon.")
-                     return
-                 }
+            // MODIFIÉ: Appel direct des méthodes au lieu d'utiliser Task { @MainActor }
+            print(">>> Tentative d'appel direct sendTestOSCMessage...")
+            sendTestOSCMessage(message: "listening_started")
 
-                 print(">>> Tentative d'appel (Task) sendTestOSCMessage...")
-                 self.sendTestOSCMessage(message: "listening_started")
-
-                 print(">>> Tentative d'appel (Task) startIdentificationTimers...")
-                 self.startIdentificationTimers()
-            }
-            print("--- Fin atteinte du bloc if isListening (Planification Task) ---") // Doit s'afficher
+            print(">>> Tentative d'appel direct startIdentificationTimers...")
+            startIdentificationTimers()
+            
+            print("--- Fin du bloc de DÉMARRAGE (appels directs) ---")
 
         } else { // === ARRÊT ===
              print("--- Début du bloc d'ARRÊT ---")
@@ -85,11 +75,9 @@ class RecognitionViewModel: ObservableObject {
 
              statusMessage = "Arrêt..."
              stopListening()
-             print(">>> Tentative d'appel (Task) sendTestOSCMessage (stop)...")
-             // Envoyer le message d'arrêt de manière asynchrone aussi
-             Task { @MainActor [weak self] in
-                 self?.sendTestOSCMessage(message: "listening_stopped")
-             }
+             print(">>> Tentative d'appel direct sendTestOSCMessage (stop)...")
+             // MODIFIÉ: Appel direct au lieu d'utiliser Task
+             sendTestOSCMessage(message: "listening_stopped")
              statusMessage = "Prêt"
         }
     } // Fin func toggleListening
@@ -209,7 +197,10 @@ class RecognitionViewModel: ObservableObject {
          print("performIdentification: Appel recordSnippet...")
 
          audioManager.recordSnippet { [weak self] result in
-              guard let self = self else { /* ... */ return }
+              guard let self = self else { 
+                  print("AudioManager callback: self est nil, abandon.")
+                  return
+              }
               // NE PAS vérifier isListening ici pour pouvoir traiter même si arrêté PENDANT record
 
              switch result {
@@ -235,11 +226,48 @@ class RecognitionViewModel: ObservableObject {
 
                             switch apiResult {
                              case .success(let audDResult):
-                                 // ... (Traitement succès identique) ...
-                                  if let resultData = audDResult { /* ... */ } else { /* ... */ }
+                                  if let resultData = audDResult {
+                                       print("AudD API: Morceau trouvé: \(resultData.title ?? "Sans titre") - \(resultData.artist ?? "Artiste inconnu")")
+                                       
+                                       // Créer TrackInfo à partir des données AudD
+                                       let newTrack = TrackInfo(
+                                           title: resultData.title,
+                                           artist: resultData.artist,
+                                           artworkURL: resultData.apple_music?.artwork?.artworkURL(width: 300, height: 300) ?? 
+                                                      resultData.spotify?.album?.images?.first?.url.flatMap { URL(string: $0) },
+                                           genre: resultData.estimatedGenre,
+                                           bpm: resultData.estimatedBpm
+                                       )
+                                       
+                                       // Ne mettre à jour que si le morceau a changé
+                                       let trackChanged = strongSelf.latestTrack != newTrack && newTrack.title != nil
+                                       if trackChanged {
+                                           strongSelf.latestTrack = newTrack
+                                           
+                                           // Envoyer les infos par OSC si OSC configuré
+                                           if strongSelf.settingsManager.isOscConfigured {
+                                               strongSelf.oscManager.sendTrackInfo(
+                                                   track: newTrack,
+                                                   host: strongSelf.settingsManager.oscHost,
+                                                   port: strongSelf.settingsManager.oscPort
+                                               )
+                                           }
+                                       }
+                                       
+                                       currentCycleStatusMessage = "Morceau trouvé!"
+                                  } else {
+                                       print("AudD API: Aucune correspondance trouvée.")
+                                       currentCycleStatusMessage = "Aucune correspondance."
+                                  }
                              case .failure(let error):
-                                 // ... (Traitement failure identique) ...
-                                  if (error as NSError).code == NSURLErrorCancelled { apiCallWasCancelled = true } else { /* ... */ }
+                                  if (error as NSError).code == NSURLErrorCancelled {
+                                       apiCallWasCancelled = true
+                                       print("AudD API: Appel annulé.")
+                                       currentCycleStatusMessage = "Identification annulée."
+                                  } else {
+                                       print("AudD API: Erreur: \(error.localizedDescription)")
+                                       currentCycleStatusMessage = "Erreur: \(error.localizedDescription)"
+                                  }
                             }
 
                             try? FileManager.default.removeItem(at: fileURL)
@@ -247,18 +275,59 @@ class RecognitionViewModel: ObservableObject {
                             print("Fin cycle identification (callback API).")
 
                             // Mise à jour statut et compte à rebours (logique identique à version précédente)
-                            if strongSelf.isListening { /* ... */ } else { /* ... */ }
+                            if strongSelf.isListening {
+                                 // Si toujours en écoute et pas annulé, préparer prochain cycle
+                                 if !apiCallWasCancelled {
+                                      // Mettre à jour le statut temporairement
+                                      if let message = currentCycleStatusMessage {
+                                           strongSelf.statusMessage = message
+                                      }
+                                      
+                                      // Rétablir "Écoute en cours..." après 2s
+                                      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                           if strongSelf.isListening {
+                                                strongSelf.statusMessage = "Écoute en cours..."
+                                           }
+                                      }
+                                      
+                                      // Réinitialiser le compteur pour le prochain cycle
+                                      let interval = TimeInterval(strongSelf.settingsManager.recognitionFrequencyMinutes * 60)
+                                      strongSelf.timeUntilNextIdentification = Int(interval)
+                                 }
+                            } else {
+                                 // Si plus en écoute, reset le statut
+                                 strongSelf.statusMessage = "Prêt"
+                            }
                        } // Fin Task @MainActor
                   } // Fin closure recognize
 
              case .failure(let error):
-                  // ... (Traitement failure audio identique, utilise if case .recordingCancelled) ...
-                   var wasAudioCancelled = false
-                   if case .recordingCancelled = (error as? AudioCaptureError) { /* ... */ } else { /* ... */ }
-                   self.isPerformingIdentification = false
-                   print("Fin cycle identification (erreur audio).")
-                   // Mise à jour statut et compte à rebours (logique identique)
-                   if self.isListening && !wasAudioCancelled { /* ... */ } else if !self.isListening { /* ... */ }
+                  var wasAudioCancelled = false
+                  if case .recordingCancelled = (error as? AudioCaptureError) {
+                       print("AudioManager: Enregistrement annulé.")
+                       wasAudioCancelled = true
+                  } else {
+                       print("AudioManager: Erreur: \(error.localizedDescription)")
+                       self.statusMessage = "Erreur audio: \(error.localizedDescription)"
+                  }
+                  self.isPerformingIdentification = false
+                  print("Fin cycle identification (erreur audio).")
+                  
+                  // Mise à jour statut et compte à rebours
+                  if self.isListening && !wasAudioCancelled {
+                       // Si erreur mais toujours en écoute, restaurer après délai
+                       DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            if self.isListening {
+                                 self.statusMessage = "Écoute en cours..."
+                                 // Réinitialiser le compteur pour prochain cycle
+                                 let interval = TimeInterval(self.settingsManager.recognitionFrequencyMinutes * 60)
+                                 self.timeUntilNextIdentification = Int(interval)
+                            }
+                       }
+                  } else if !self.isListening {
+                       // Si plus en écoute, reset statut
+                       self.statusMessage = "Prêt"
+                  }
              } // Fin switch result
          } // Fin closure recordSnippet
      } // Fin func performIdentification
