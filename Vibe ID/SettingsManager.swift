@@ -1,87 +1,122 @@
-// Fichier: SettingsManager.swift
-// (Version Corrigée : Guillemet manquant dans print)
+// SettingsManager.swift
+// Vibe ID
+//
+// Created by Studio Carlos in 2025.
+// Copyright (C) 2025 Studio Carlos
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Foundation
-import KeychainAccess
 import Combine
+import SwiftUI
 
+/// Manager that handles application settings and persistence
 @MainActor
 class SettingsManager: ObservableObject {
 
+    // Singleton instance for access throughout the app
     static let shared = SettingsManager()
 
-    private enum Keys {
-        static let oscHost = "oscHost"
-        static let oscPort = "oscPort"
-        static let frequency = "recognitionFrequency"
-        static let keychainService = "fr.studiocarlos.VibeID"
-        static let apiKey = "audD_api_key"
-    }
+    // Default values
+    private let defaultOSCHost = "127.0.0.1"
+    private let defaultOSCPort = 9000
+    private let defaultRecognitionFrequencyMinutes = 5
 
-    private let keychain = Keychain(service: Keys.keychainService)
+    // UserDefaults keys
+    private let apiKeyKey = "audApiKey"
+    private let oscHostKey = "oscHost"
+    private let oscPortKey = "oscPort"
+    private let recognitionFrequencyKey = "recognitionFrequency"
 
-    @Published var oscHost: String = "192.168.1.100" {
-        didSet { UserDefaults.standard.set(oscHost, forKey: Keys.oscHost) }
-    }
-    @Published var oscPort: Int = 12000 {
-        didSet { UserDefaults.standard.set(max(1, min(65535, oscPort)), forKey: Keys.oscPort) }
-    }
-    @Published var recognitionFrequencyMinutes: Int = 5 {
-        didSet { UserDefaults.standard.set(max(1, min(10, recognitionFrequencyMinutes)), forKey: Keys.frequency) }
-    }
-    @Published var apiKey: String? {
-        didSet { saveApiKey() }
-    }
+    // Published properties to allow views to observe changes
+    // Initialize all properties at declaration to fix compilation error
+    @Published var oscHost: String = ""
+    @Published var oscPort: Int = 9000
+    @Published var recognitionFrequencyMinutes: Int = 5
+    @Published var apiKey: String? = nil
 
+    // Private initializer (Singleton pattern)
     private init() {
-        self.oscHost = UserDefaults.standard.string(forKey: Keys.oscHost) ?? self.oscHost
-        let loadedPort = UserDefaults.standard.integer(forKey: Keys.oscPort)
-        self.oscPort = loadedPort == 0 ? self.oscPort : loadedPort
-        let loadedFreq = UserDefaults.standard.integer(forKey: Keys.frequency)
-        self.recognitionFrequencyMinutes = loadedFreq == 0 ? self.recognitionFrequencyMinutes : loadedFreq
-        self.apiKey = loadApiKey()
-        print("SettingsManager Initialisé: Host=\(oscHost), Port=\(oscPort), Freq=\(recognitionFrequencyMinutes)min, APIKey Loaded=\(apiKey != nil)")
+        // Load settings from UserDefaults
+        let defaults = UserDefaults.standard
+        
+        // Initialize properties
+        self.apiKey = defaults.string(forKey: apiKeyKey)
+        self.oscHost = defaults.string(forKey: oscHostKey) ?? defaultOSCHost
+        self.oscPort = defaults.integer(forKey: oscPortKey)
+        
+        // If port is 0 (not set), use default
+        if self.oscPort == 0 {
+            self.oscPort = defaultOSCPort
+        }
+        
+        // Get recognition frequency, use default if not set
+        self.recognitionFrequencyMinutes = defaults.integer(forKey: recognitionFrequencyKey)
+        if self.recognitionFrequencyMinutes == 0 {
+            self.recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
+        }
+        
+        print("[SettingsManager] Initialized with OSC config: \(oscHost):\(oscPort)")
     }
-
-    // Méthodes de Sauvegarde/Chargement
-    private func saveApiKey() {
-        if let key = self.apiKey, !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            do {
-                try keychain.set(key, key: Keys.apiKey)
-                print("Clé API sauvegardée dans le Keychain.")
-            } catch { print("Erreur sauvegarde Keychain: \(error)") }
+    
+    // Saves all settings to UserDefaults
+    private func saveSettings() {
+        let defaults = UserDefaults.standard
+        
+        // Save API key (can be nil)
+        if let apiKey = apiKey {
+            defaults.set(apiKey, forKey: apiKeyKey)
         } else {
-            do {
-                try keychain.remove(Keys.apiKey)
-                // <<< CORRECTION ICI : Ajout du guillemet fermant >>>
-                print("Clé API supprimée du Keychain.")
-            } catch { print("Erreur suppression Keychain: \(error)") }
+            defaults.removeObject(forKey: apiKeyKey)
         }
+        
+        // Save OSC settings
+        defaults.set(oscHost, forKey: oscHostKey)
+        defaults.set(oscPort, forKey: oscPortKey)
+        
+        // Save recognition frequency
+        defaults.set(recognitionFrequencyMinutes, forKey: recognitionFrequencyKey)
+        
+        print("[SettingsManager] Settings saved")
+    }
+    
+    // Returns true if the app has a valid API key configured
+    var hasValidAPIKey: Bool {
+        guard let key = apiKey else { return false }
+        return !key.isEmpty
+    }
+    
+    // Returns true if OSC configuration is valid
+    var hasValidOSCConfig: Bool {
+        return !oscHost.isEmpty && oscPort > 0
     }
 
-    private func loadApiKey() -> String? {
-        do {
-            return try keychain.getString(Keys.apiKey)
-        } catch let error {
-            print("Erreur lecture Keychain (ou clé absente): \(error.localizedDescription)")
-            return nil
-        }
+    // Reset all settings to defaults
+    func resetToDefaults() {
+        apiKey = nil
+        oscHost = defaultOSCHost
+        oscPort = defaultOSCPort
+        recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
+        print("[SettingsManager] All settings reset to defaults")
     }
 
-    // Propriétés Calculées
-    var isOscConfigured: Bool {
-        print("--- Checking isOscConfigured: Host='\(self.oscHost)', Port=\(self.oscPort)")
-        let hostIsValid = !self.oscHost.trimmingCharacters(in: .whitespaces).isEmpty
-        let portIsValid = self.oscPort > 0 && self.oscPort <= 65535
-        let configured = hostIsValid && portIsValid
-        print("--- isOscConfigured Result: \(configured) (Host valid: \(hostIsValid), Port valid: \(portIsValid))")
-        return configured
-    }
+} // End of SettingsManager class
 
-    var isApiKeySet: Bool {
-        let keyIsPresentAndValid = self.apiKey != nil && !(self.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-        // print("--- Checking isApiKeySet: Result = \(keyIsPresentAndValid)") // Optionnel debug
-        return keyIsPresentAndValid
-    }
-
-} // Fin classe SettingsManager
+// Recognition modes available
+enum RecognitionMode: String, CaseIterable, Identifiable {
+    case audd = "AudD API"
+    case manual = "Manual Input"
+    
+    var id: String { self.rawValue }
+}

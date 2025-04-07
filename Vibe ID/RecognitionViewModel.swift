@@ -1,21 +1,36 @@
-// Fichier: RecognitionViewModel.swift
-// (Basé sur la version #41 - Correction typo print - AVEC Task @MainActor dans toggleListening)
+// RecognitionViewModel.swift
+// Vibe ID
+//
+// Created by Studio Carlos in 2025.
+// Copyright (C) 2025 Studio Carlos
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Foundation
 import Combine
 import SwiftUI
-import OSCKit // Assurer que l'import est là
+import OSCKit // Ensure import is present
 
-// --- TrackInfo Struct (dans TrackInfo.swift) ---
+// --- TrackInfo Struct (in TrackInfo.swift) ---
 
 @MainActor
 class RecognitionViewModel: ObservableObject {
 
     @Published var isListening: Bool = false
-    @Published var statusMessage: String = "Prêt"
+    @Published var statusMessage: String = "Ready"
     @Published var latestTrack: TrackInfo? = nil
-    // Ajouter la propriété pour le compte à rebours qui manquait peut-être dans la version #41 ?
-    // Assurons-nous qu'elle est bien là pour que ContentView compile.
+    // Property to track the countdown until next identification
     @Published var timeUntilNextIdentification: Int? = nil
 
     private let settingsManager = SettingsManager.shared
@@ -24,111 +39,117 @@ class RecognitionViewModel: ObservableObject {
     private let oscManager = OSCManager()
 
     private var identificationTimer: Timer?
-    private var displayTimer: Timer? // Assurer que ce timer est aussi présent
+    private var displayTimer: Timer? // Timer for displaying countdown
     var isPerformingIdentification = false {
-        didSet { print(">>> isPerformingIdentification changé à: \(isPerformingIdentification)") }
+        didSet { print(">>> isPerformingIdentification changed to: \(isPerformingIdentification)") }
     }
 
 
     init() {
-        print("RecognitionViewModel Initialisé")
+        print("RecognitionViewModel Initialized")
     }
 
-    // --- Actions UI ---
+    deinit {
+        // Standard cleanup
+        print("RecognitionViewModel deinit")
+    }
+
+    // --- UI Actions ---
 
     func toggleListening() {
-        print("--- toggleListening() appelée --- (isPerformingIdentification = \(isPerformingIdentification))")
+        print("--- toggleListening() called --- (isPerformingIdentification = \(isPerformingIdentification))")
         guard !isPerformingIdentification else {
-            print("toggleListening: Ignoré car isPerformingIdentification est true.")
+            print("toggleListening: Ignored because isPerformingIdentification is true.")
             return
         }
 
         let shouldStartListening = !isListening
 
-        if shouldStartListening { // === TENTATIVE DE DÉMARRAGE ===
-            print("--- Début du bloc de DÉMARRAGE ---")
-            print("Settings Check: isApiKeySet = \(settingsManager.isApiKeySet) (Clé: '\(settingsManager.apiKey ?? "nil")')") // Debug
-            guard settingsManager.isApiKeySet else {
-                statusMessage = "Erreur: Clé API AudD manquante."
-                print(">>> ÉCHEC DÉMARRAGE: Clé API manquante ou vide.")
+        if shouldStartListening { // === START ATTEMPT ===
+            print("--- Beginning of START block ---")
+            print("Settings Check: hasValidAPIKey = \(settingsManager.hasValidAPIKey) (Key: '\(settingsManager.apiKey ?? "nil")')") // Debug
+            guard settingsManager.hasValidAPIKey else {
+                statusMessage = "Error: AudD API key missing."
+                print(">>> START FAILURE: API key missing or empty.")
                 return
             }
 
-            print("--- Clé API OK ---")
-            isListening = true // Activation de l'état
-            statusMessage = "Écoute en cours..."
-            print("Toggle Listening: isListening mis à \(isListening)")
+            print("--- API Key OK ---")
+            isListening = true // Activate state
+            statusMessage = "Listening..."
+            print("Toggle Listening: isListening set to \(isListening)")
 
-            // MODIFIÉ: Appel direct des méthodes au lieu d'utiliser Task { @MainActor }
-            print(">>> Tentative d'appel direct sendTestOSCMessage...")
+            // Direct method calls instead of using Task { @MainActor }
+            print(">>> Attempting direct call sendTestOSCMessage...")
             sendTestOSCMessage(message: "listening_started")
 
-            print(">>> Tentative d'appel direct startIdentificationTimers...")
+            print(">>> Attempting direct call startIdentificationTimers...")
             startIdentificationTimers()
             
-            print("--- Fin du bloc de DÉMARRAGE (appels directs) ---")
+            print("--- End of START block (direct calls) ---")
 
-        } else { // === ARRÊT ===
-             print("--- Début du bloc d'ARRÊT ---")
-             isListening = false // Désactivation de l'état
-             print("Toggle Listening: isListening mis à \(isListening)")
+        } else { // === STOP ===
+             print("--- Beginning of STOP block ---")
+             isListening = false // Deactivate state
+             print("Toggle Listening: isListening set to \(isListening)")
 
-             statusMessage = "Arrêt..."
+             statusMessage = "Stopping..."
              stopListening()
-             print(">>> Tentative d'appel direct sendTestOSCMessage (stop)...")
-             // MODIFIÉ: Appel direct au lieu d'utiliser Task
+             print(">>> Attempting direct call sendTestOSCMessage (stop)...")
+             // Direct call instead of using Task
              sendTestOSCMessage(message: "listening_stopped")
-             statusMessage = "Prêt"
+             statusMessage = "Ready"
         }
-    } // Fin func toggleListening
-
-    // ... (Le reste du fichier est identique à la version #41 que vous avez fournie,
-    //      qui incluait sendManualPrompt, start/stop timers, stopListening, performIdentification, sendTestOSCMessage) ...
+    } // End func toggleListening
 
      func sendManualPrompt(prompt: String) {
          guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-         print("Envoi du prompt manuel demandé : \(prompt)")
-         guard settingsManager.isOscConfigured else {
-             statusMessage = "Erreur: Config OSC manquante."
+         print("Sending manual prompt: \(prompt)")
+         
+         guard settingsManager.hasValidOSCConfig else {
+             statusMessage = "Error: OSC configuration missing."
+             print("OSC not configured: Host='\(settingsManager.oscHost)', Port=\(settingsManager.oscPort)")
              DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                 if self.isListening { self.statusMessage = "Écoute en cours..." }
-                 else { self.statusMessage = "Prêt" }
+                 if self.isListening { self.statusMessage = "Listening..." }
+                 else { self.statusMessage = "Ready" }
              }
              return
          }
+         
          let previousStatus = statusMessage
-         statusMessage = "Envoi OSC prompt..."
-
-         print(">>> Appel oscManager.sendManualPrompt...")
+         statusMessage = "Sending OSC prompt..."
+         
+         print(">>> Calling oscManager.sendManualPrompt...")
          oscManager.sendManualPrompt(
-            prompt: prompt,
-            host: settingsManager.oscHost,
-            port: settingsManager.oscPort
+             prompt: prompt,
+             host: settingsManager.oscHost,
+             port: settingsManager.oscPort
          )
-
+         
+         print(">>> OSC send completed for prompt: \(prompt)")
+         
          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-              if self.statusMessage == "Envoi OSC prompt..." {
-                   self.statusMessage = previousStatus
-              }
+             if self.statusMessage == "Sending OSC prompt..." {
+                 self.statusMessage = previousStatus
+             }
          }
      }
 
      private func startIdentificationTimers() {
-         // Correction typo du print
-         print("--- startIdentificationTimers appelée --- (Fréq: \(settingsManager.recognitionFrequencyMinutes) min)")
+         print("--- startIdentificationTimers called --- (Frequency: \(settingsManager.recognitionFrequencyMinutes) min)")
          identificationTimer?.invalidate()
-         stopDisplayTimer() // Arrêter ancien timer affichage
+         stopDisplayTimer() // Stop previous display timer
 
-         // Lancer performIdentification immédiatement (comme dans la version #41)
-         // Si cela cause des problèmes, on remettra l'appel asynchrone ici.
-         print("Appel immédiat de performIdentification depuis startIdentificationTimers")
+         // Launch performIdentification immediately
+    
+         print("Immediate call to performIdentification from startIdentificationTimers")
          performIdentification()
 
          let interval = TimeInterval(settingsManager.recognitionFrequencyMinutes * 60)
          timeUntilNextIdentification = Int(interval)
          identificationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
              DispatchQueue.main.async {
-                 print("Timer Principal (ID) déclenché.")
+                 print("Main Timer (ID) triggered.")
                  if self?.isListening == true {
                       self?.performIdentification()
                  } else {
@@ -138,7 +159,7 @@ class RecognitionViewModel: ObservableObject {
          }
 
          displayTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-             DispatchQueue.main.async { // Assurer MainActor
+             DispatchQueue.main.async { // Ensure MainActor
                  guard let self = self, self.isListening else {
                      self?.stopDisplayTimer()
                      return
@@ -150,204 +171,174 @@ class RecognitionViewModel: ObservableObject {
                  }
              }
          }
-         print("--- Nouveaux timers planifiés dans startIdentificationTimers ---")
+         print("--- New timers scheduled in startIdentificationTimers ---")
      }
 
      private func stopIdentificationTimer() {
-         print("Arrêt du Timer Principal (ID).")
+         print("Stopping Main Timer (ID).")
          identificationTimer?.invalidate()
          identificationTimer = nil
      }
 
      private func stopDisplayTimer() {
-         print("Arrêt du Timer d'Affichage (Compte à rebours).")
+         print("Stopping Display Timer (Countdown).")
          displayTimer?.invalidate()
          displayTimer = nil
          timeUntilNextIdentification = nil
      }
 
      private func stopListening() {
-         print("RecognitionViewModel: Arrêt des opérations demandé...")
+         print("RecognitionViewModel: Stop operations requested...")
          stopIdentificationTimer()
          stopDisplayTimer()
-         print("RecognitionViewModel: Demande d'annulation à AudioCaptureManager...")
+         print("RecognitionViewModel: Cancellation request to AudioCaptureManager...")
          audioManager.cancelRecording()
-         print("RecognitionViewModel: Demande d'annulation à AudDAPIManager...")
+         print("RecognitionViewModel: Cancellation request to AudDAPIManager...")
          apiManager.cancelCurrentRequest()
-         isPerformingIdentification = false // Assurer le reset du flag
-         // isListening est géré par toggleListening
+         isPerformingIdentification = false // Ensure flag reset
+         // isListening is managed by toggleListening
      }
 
 
      private func performIdentification() {
-         print("--- performIdentification appelée ---")
-         guard !isPerformingIdentification else { print("Identification déjà en cours, skip."); return }
-         guard isListening else { print("Plus en écoute au début de performIdentification, annulation."); return }
+         print("--- performIdentification called ---")
+         guard !isPerformingIdentification else { print("Identification already in progress, skip."); return }
+         guard isListening else { print("Not listening at the beginning of performIdentification, cancel."); return }
          guard let apiKey = settingsManager.apiKey, !apiKey.isEmpty else {
-             statusMessage = "Erreur: Clé API AudD manquante."; print("Échec: Clé API manquante.");
+             statusMessage = "Error: AudD API key missing."; print("Failure: API key missing.");
               isListening = false
               stopListening()
-              statusMessage = "Prêt (Clé API manquante)"
-             return
+              statusMessage = "Ready (API key missing)"
+              return
          }
 
-         isPerformingIdentification = true
-         statusMessage = "Enregistrement audio..."
-         timeUntilNextIdentification = nil // Masquer pendant ID
-         print("performIdentification: Appel recordSnippet...")
+         // Reset timer for next identification
+         timeUntilNextIdentification = settingsManager.recognitionFrequencyMinutes * 60
 
+         // Update state and UI
+         isPerformingIdentification = true
+         statusMessage = "Recording audio..."
+         print("RecognitionViewModel: Starting audio recording...")
+
+         // Start audio recording
          audioManager.recordSnippet { [weak self] result in
               guard let self = self else { 
-                  print("AudioManager callback: self est nil, abandon.")
-                  return
+                   print("AudioManager callback: self is nil, abandon.")
+                   return
               }
-              // NE PAS vérifier isListening ici pour pouvoir traiter même si arrêté PENDANT record
 
-             switch result {
-             case .success(let fileURL):
-                  print("Audio enregistré: \(fileURL.lastPathComponent)")
-                  // Vérifier isListening AVANT appel API
-                  guard self.isListening else {
-                       print("Callback recordSnippet: Non en écoute avant appel API, abandon.")
-                       try? FileManager.default.removeItem(at: fileURL)
-                       self.isPerformingIdentification = false
-                       return
-                  }
-                  self.statusMessage = "Envoi API AudD..."
-
-                  self.apiManager.recognize(audioFileURL: fileURL, apiKey: apiKey) { [weak self] apiResult in
-                       // Traiter le résultat sur MainActor
-                       Task { @MainActor [weak self] in
-                            guard let strongSelf = self else { return }
-                            // NE PAS vérifier isListening ici pour pouvoir traiter même si arrêté PENDANT API call
-
-                            var currentCycleStatusMessage: String? = nil
-                            var apiCallWasCancelled = false
-
-                            switch apiResult {
-                             case .success(let audDResult):
-                                  if let resultData = audDResult {
-                                       print("AudD API: Morceau trouvé: \(resultData.title ?? "Sans titre") - \(resultData.artist ?? "Artiste inconnu")")
-                                       
-                                       // Créer TrackInfo à partir des données AudD
-                                       let newTrack = TrackInfo(
-                                           title: resultData.title,
-                                           artist: resultData.artist,
-                                           artworkURL: resultData.apple_music?.artwork?.artworkURL(width: 300, height: 300) ?? 
-                                                      resultData.spotify?.album?.images?.first?.url.flatMap { URL(string: $0) },
-                                           genre: resultData.estimatedGenre,
-                                           bpm: resultData.estimatedBpm
-                                       )
-                                       
-                                       // Ne mettre à jour que si le morceau a changé
-                                       let trackChanged = strongSelf.latestTrack != newTrack && newTrack.title != nil
-                                       if trackChanged {
-                                           strongSelf.latestTrack = newTrack
-                                           
-                                           // Envoyer les infos par OSC si OSC configuré
-                                           if strongSelf.settingsManager.isOscConfigured {
-                                               strongSelf.oscManager.sendTrackInfo(
-                                                   track: newTrack,
-                                                   host: strongSelf.settingsManager.oscHost,
-                                                   port: strongSelf.settingsManager.oscPort
-                                               )
-                                           }
+              switch result {
+              case .success(let audioURL):
+                   print("Audio recording successful: \(audioURL.lastPathComponent)")
+                   self.statusMessage = "Identifying music..."
+                   
+                   // Launch API call with the audio file
+                   self.apiManager.recognize(audioFileURL: audioURL, apiKey: apiKey) { [weak self] result in
+                        guard let self = self else {
+                             print("AudD API callback: self is nil, abandon.")
+                             return
+                        }
+                   
+                        switch result {
+                        case .success(let audDResult):
+                             if let resultData = audDResult {
+                                  print("Song identified: \(resultData.title ?? "Unknown")")
+                                  
+                                  // Create TrackInfo from the result
+                                  let identifiedTrack = TrackInfo(
+                                       title: resultData.title ?? "Unknown Title",
+                                       artist: resultData.artist ?? "Unknown Artist",
+                                       artworkURL: (resultData.spotify?.album?.images?.first?.url != nil) ? 
+                                           URL(string: resultData.spotify?.album?.images?.first?.url ?? "") : 
+                                           resultData.apple_music?.artwork?.artworkURL(width: 300, height: 300),
+                                       genre: resultData.estimatedGenre,
+                                       bpm: resultData.estimatedBpm,
+                                       energy: resultData.estimatedEnergy,
+                                       danceability: resultData.estimatedDanceability
+                                  )
+                                  
+                                  // Update UI with new track
+                                  DispatchQueue.main.async {
+                                       self.latestTrack = identifiedTrack
+                                       if self.isListening {
+                                            let titleDisplay = identifiedTrack.title ?? "Unknown Title"
+                                            let artistDisplay = identifiedTrack.artist ?? "Unknown Artist"
+                                            self.statusMessage = "Identified: \"\(titleDisplay)\" by \"\(artistDisplay)\""
+                                            
+                                            // Send track info to OSC if configured
+                                            if self.settingsManager.hasValidOSCConfig {
+                                                 self.sendTrackInfoToOSC(identifiedTrack)
+                                            }
+                                       } else {
+                                            self.statusMessage = "Ready (Listening stopped)"
                                        }
                                        
-                                       currentCycleStatusMessage = "Morceau trouvé!"
-                                  } else {
-                                       print("AudD API: Aucune correspondance trouvée.")
-                                       currentCycleStatusMessage = "Aucune correspondance."
+                                       self.isPerformingIdentification = false
                                   }
-                             case .failure(let error):
-                                  if (error as NSError).code == NSURLErrorCancelled {
-                                       apiCallWasCancelled = true
-                                       print("AudD API: Appel annulé.")
-                                       currentCycleStatusMessage = "Identification annulée."
-                                  } else {
-                                       print("AudD API: Erreur: \(error.localizedDescription)")
-                                       currentCycleStatusMessage = "Erreur: \(error.localizedDescription)"
+                             } else {
+                                  print("AudD found no match")
+                                  DispatchQueue.main.async {
+                                       if self.isListening {
+                                            self.statusMessage = "No music detected"
+                                       } else {
+                                            self.statusMessage = "Ready"
+                                       }
+                                       self.isPerformingIdentification = false
                                   }
-                            }
-
-                            try? FileManager.default.removeItem(at: fileURL)
-                            strongSelf.isPerformingIdentification = false // Fin cycle
-                            print("Fin cycle identification (callback API).")
-
-                            // Mise à jour statut et compte à rebours (logique identique à version précédente)
-                            if strongSelf.isListening {
-                                 // Si toujours en écoute et pas annulé, préparer prochain cycle
-                                 if !apiCallWasCancelled {
-                                      // Mettre à jour le statut temporairement
-                                      if let message = currentCycleStatusMessage {
-                                           strongSelf.statusMessage = message
-                                      }
-                                      
-                                      // Rétablir "Écoute en cours..." après 2s
-                                      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                           if strongSelf.isListening {
-                                                strongSelf.statusMessage = "Écoute en cours..."
-                                           }
-                                      }
-                                      
-                                      // Réinitialiser le compteur pour le prochain cycle
-                                      let interval = TimeInterval(strongSelf.settingsManager.recognitionFrequencyMinutes * 60)
-                                      strongSelf.timeUntilNextIdentification = Int(interval)
-                                 }
-                            } else {
-                                 // Si plus en écoute, reset le statut
-                                 strongSelf.statusMessage = "Prêt"
-                            }
-                       } // Fin Task @MainActor
-                  } // Fin closure recognize
-
-             case .failure(let error):
-                  var wasAudioCancelled = false
-                  if case .recordingCancelled = (error as? AudioCaptureError) {
-                       print("AudioManager: Enregistrement annulé.")
-                       wasAudioCancelled = true
-                  } else {
-                       print("AudioManager: Erreur: \(error.localizedDescription)")
-                       self.statusMessage = "Erreur audio: \(error.localizedDescription)"
-                  }
-                  self.isPerformingIdentification = false
-                  print("Fin cycle identification (erreur audio).")
-                  
-                  // Mise à jour statut et compte à rebours
-                  if self.isListening && !wasAudioCancelled {
-                       // Si erreur mais toujours en écoute, restaurer après délai
-                       DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            if self.isListening {
-                                 self.statusMessage = "Écoute en cours..."
-                                 // Réinitialiser le compteur pour prochain cycle
-                                 let interval = TimeInterval(self.settingsManager.recognitionFrequencyMinutes * 60)
-                                 self.timeUntilNextIdentification = Int(interval)
-                            }
-                       }
-                  } else if !self.isListening {
-                       // Si plus en écoute, reset statut
-                       self.statusMessage = "Prêt"
-                  }
-             } // Fin switch result
-         } // Fin closure recordSnippet
-     } // Fin func performIdentification
+                             }
+                             
+                        case .failure(let error):
+                             print("AudD API error: \(error.localizedDescription)")
+                             DispatchQueue.main.async {
+                                  if self.isListening {
+                                       self.statusMessage = "Error: \(error.localizedDescription)"
+                                  } else {
+                                       self.statusMessage = "Ready (Error)"
+                                  }
+                                  self.isPerformingIdentification = false
+                             }
+                        }
+                   }
+                   
+              case .failure(let error):
+                   print("Audio recording error: \(error.localizedDescription)")
+                   DispatchQueue.main.async {
+                        if self.isListening {
+                             self.statusMessage = "Error: Recording failed"
+                        } else {
+                             self.statusMessage = "Ready (Recording failed)"
+                        }
+                        self.isPerformingIdentification = false
+                   }
+              }
+         }
+     }
 
 
-     // --- Fonctions OSC ---
+     // --- OSC Functions ---
      private func sendTestOSCMessage(message: String) {
-          print("--- sendTestOSCMessage appelée ---")
-          print("OSC Test: Vérification configuration...")
-          guard settingsManager.isOscConfigured else {
-               print(">>> OSC Test: Non configuré, skip. Host='\(settingsManager.oscHost)', Port=\(settingsManager.oscPort)")
-               return
-          }
-          print(">>> OSC Test: Config OK. Appel oscManager.send (Test: \(message))...")
+        print("--- sendTestOSCMessage called ---")
+        print("OSC Test: Checking configuration...")
+        guard settingsManager.hasValidOSCConfig else {
+            print(">>> OSC Test: Not configured, skip. Host='\(settingsManager.oscHost)', Port=\(settingsManager.oscPort)")
+            return
+        }
+        print(">>> OSC Test: Config OK. Calling oscManager.send (Test: \(message))...")
 
-          let addr = OSCAddressPattern("/vibeid/app/status")
-          let values: [any OSCValue] = [message]
-          oscManager.send(OSCMessage(addr, values: values),
-                          to: settingsManager.oscHost,
-                          port: settingsManager.oscPort)
-     } // Fin func sendTestOSCMessage
+        // Only use standardized OSC address with the /vibeid/ prefix
+        oscManager.sendStatusMessage(status: message, 
+                                    host: settingsManager.oscHost, 
+                                    port: settingsManager.oscPort)
+    } // End func sendTestOSCMessage
+    
+    private func sendTrackInfoToOSC(_ track: TrackInfo) {
+        print("Sending track info to OSC...")
+        oscManager.sendTrackInfo(
+            track: track,
+            host: settingsManager.oscHost,
+            port: settingsManager.oscPort
+        )
+        print("Track info sent to OSC")
+    }
 
-} // Fin classe RecognitionViewModel
+} // End of RecognitionViewModel class
