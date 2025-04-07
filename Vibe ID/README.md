@@ -4,12 +4,23 @@
 
 ![Vibe ID Interface](https://raw.githubusercontent.com/studiocarlos/vibeid/main/screenshots/vibe-id-screenshot.png)
 
-## Version 1.1 Updates
-- **Enhanced UI**: Sleek neon-style interface optimized for nighttime visibility
-- **Improved layout**: Better positioning and space management with all elements visible without scrolling
-- **Keyboard interaction**: Title gracefully disappears when keyboard appears
-- **Performance optimizations**: Smoother animations and transitions
-- **Code quality**: Full documentation for better collaboration
+## What's New in Version 1.1
+
+### Enhanced User Interface
+- Sleek neon-style interface optimized for nighttime visibility
+- Better positioning and space management with no scrolling required
+- Title gracefully disappears when keyboard appears
+- Improved layout for DJs and VJs
+
+### Technical Improvements
+- Performance optimizations for smoother animations
+- Full English documentation for better collaboration
+- Better OSC integration with detailed track metadata
+
+### Bug Fixes
+- Fixed layout issues with keyboard display
+- Improved space management for all UI elements
+- Optimized display of track information
 
 ## Features
 
