@@ -48,8 +48,8 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 
-# Secrets - Ne jamais commiter de clés API directement !
-# (Bien que la clé AudD soit gérée par Keychain, c'est une bonne pratique)
+# Secrets - Never commit API keys directly!
+# (Even though the AudD key is managed by Keychain, it's good practice)
 # *.secret
 # .env
 

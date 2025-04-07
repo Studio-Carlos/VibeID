@@ -188,8 +188,21 @@ struct SettingsView: View {
                 }
 
             } // End Form
+            .scrollContentBackground(.hidden) // Make form background transparent
+            .background(
+                // Dark gradient background similar to main view
+                LinearGradient(
+                    colors: [Color.black, Color(red: 0.1, green: 0.1, blue: 0.2)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("Vibe ID Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(Color.black.opacity(0.8), for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 // Button to close modal sheet
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -197,6 +210,7 @@ struct SettingsView: View {
                         dismiss() // Close modal view
                     }
                     .fontWeight(.bold) // Make OK bold
+                    .foregroundColor(.blue) // Highlight the OK button
                 }
             }
             // Load initial API key into text field when view appears
@@ -220,6 +234,10 @@ struct SettingsView: View {
                         }
                     }
                     .navigationTitle("OSC Network Diagnostic")
+                    .background(Color.black)
+                    .toolbarBackground(.visible, for: .navigationBar)
+                    .toolbarBackground(Color.black.opacity(0.8), for: .navigationBar)
+                    .toolbarColorScheme(.dark, for: .navigationBar)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Close") {
@@ -231,10 +249,20 @@ struct SettingsView: View {
                 .presentationDetents([.medium, .large])
             }
         } // End NavigationStack
+        .preferredColorScheme(.dark)
     } // End body
 } // End struct SettingsView
+
+// Extension to configure the sheet presentation in dark mode
+extension View {
+    func darkModePresentationBackground() -> some View {
+        self.presentationBackground(Color.black.gradient)
+            .preferredColorScheme(.dark)
+    }
+}
 
 // --- Preview ---
 #Preview {
     SettingsView()
+        .darkModePresentationBackground()
 }

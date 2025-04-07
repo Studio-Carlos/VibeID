@@ -2,15 +2,25 @@
 
 **Vibe ID** is an iOS application that identifies the music you're listening to and sends identification data via OSC (Open Sound Control) to other software like TouchDesigner, MaxMSP, or Chataigne.
 
+![Vibe ID Interface](https://raw.githubusercontent.com/studiocarlos/vibeid/main/screenshots/vibe-id-screenshot.png)
+
+## Version 1.1 Updates
+- **Enhanced UI**: Sleek neon-style interface optimized for nighttime visibility
+- **Improved layout**: Better positioning and space management with all elements visible without scrolling
+- **Keyboard interaction**: Title gracefully disappears when keyboard appears
+- **Performance optimizations**: Smoother animations and transitions
+- **Code quality**: Full documentation for better collaboration
+
 ## Features
 
 - Audio identification every X minutes via the [AudD](https://audd.io/) API
 - Sending musical identification data via OSC
-- Simple and intuitive user interface
+- Simple and intuitive user interface with DJ/VJ-oriented design
 - Customizable recognition interval configuration
-- History of identified tracks
+- Real-time track information display (BPM, energy, danceability)
 - Manual prompt functionality for free expression
 - Network diagnostics for OSC connection
+- Dark theme with glowing neon accents
 
 ## Requirements
 
@@ -63,15 +73,23 @@ This project is licensed under the [GNU GPLv3](LICENSE).
 
 **Vibe ID** est une application iOS qui identifie la musique que vous écoutez et envoie les données d'identification via OSC (Open Sound Control) à d'autres logiciels comme TouchDesigner, MaxMSP ou Chataigne.
 
+## Mises à jour de la version 1.1
+- **Interface améliorée** : Interface élégante de style néon optimisée pour la visibilité nocturne
+- **Meilleure disposition** : Meilleur positionnement et gestion de l'espace avec tous les éléments visibles sans défilement
+- **Interaction clavier** : Le titre disparaît élégamment lorsque le clavier apparaît
+- **Optimisations de performance** : Animations et transitions plus fluides
+- **Qualité du code** : Documentation complète en anglais pour une meilleure collaboration
+
 ## Fonctionnalités
 
 - Identification audio toute les X minutes via l'API [AudD](https://audd.io/)
 - Envoi des données d'identification musicales via OSC
-- Interface utilisateur simple et intuitive
+- Interface utilisateur simple et intuitive avec design orienté DJ/VJ
 - Configuration d'intervalle de reconnaissance personnalisable
-- Historique des morceaux identifiés
+- Affichage en temps réel des informations de piste (BPM, énergie, dansabilité)
 - Fonctionnalité de prompt manuel pour l'expression libre
 - Diagnostic réseau pour la connexion OSC
+- Thème sombre avec accents néon lumineux
 
 ## Prérequis
 
