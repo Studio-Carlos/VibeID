@@ -120,7 +120,7 @@ struct SettingsView: View {
                 // Section for OSC Configuration
                 Section("OSC Configuration") {
                     TextField("Target IP Address (e.g.: 192.168.1.100)", text: $settings.oscHost)
-                        .keyboardType(.decimalPad)
+                        .keyboardType(.URL)
                         .autocorrectionDisabled(true) // Disable auto-correction for IPs
                         .textInputAutocapitalization(.never) // No auto caps
 
