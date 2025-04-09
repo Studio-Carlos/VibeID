@@ -328,6 +328,46 @@ struct ContentView: View {
                         .opacity(keyboardShown ? 0 : 1) // Hide when keyboard is visible
                         .animation(.easeInOut(duration: 0.3), value: keyboardShown)
                         
+                        // Left-aligned test button
+                        HStack {
+                            Button {
+                                simulateTrackDetection()
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.black.opacity(0.6))
+                                        .frame(width: 44, height: 44)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(
+                                                    LinearGradient(
+                                                        colors: [.green.opacity(0.6), .blue.opacity(0.6)],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    ),
+                                                    lineWidth: 1.5
+                                                )
+                                        )
+                                        .shadow(color: .green.opacity(0.5), radius: 4, x: 0, y: 0)
+                                    
+                                    Image(systemName: "music.note")
+                                        .font(.system(size: 18))
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [.gray, .white.opacity(0.7)],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            )
+                                        )
+                                }
+                            }
+                            .padding(.top, 10)
+                            .padding(.leading, 15)
+                            .buttonStyle(ScaleButtonStyle())
+                            
+                            Spacer()
+                        }
+                        
                         // Right-aligned settings button
                         HStack {
                             Spacer()
@@ -590,106 +630,61 @@ struct ContentView: View {
                                 
                                 // Track metadata
                                 VStack(spacing: 5) {
-                                    // Genre & BPM
-                                    HStack(spacing: 10) {
-                                        if let genre = viewModel.latestTrack?.genre, !genre.isEmpty {
-                                            HStack(spacing: 4) {
-                                                Image(systemName: "music.note.list")
-                                                    .font(.system(size: 11, weight: .semibold))
-                                                    .foregroundColor(.cyan)
-                                                Text(genre)
-                                                    .font(.system(.caption2, design: .rounded))
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(.white.opacity(0.9))
-                                            }
-                                            .techBadge()
+                                    // Genre
+                                    if let genre = viewModel.latestTrack?.genre, !genre.isEmpty {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "music.note.list")
+                                                .font(.system(size: 11, weight: .semibold))
+                                                .foregroundColor(.cyan)
+                                            Text(genre)
+                                                .font(.system(.caption2, design: .rounded))
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.white.opacity(0.9))
                                         }
-                                        
-                                        if let bpm = viewModel.latestTrack?.bpm {
-                                            HStack(spacing: 4) {
-                                                Image(systemName: "metronome")
-                                                    .font(.system(size: 11, weight: .semibold))
-                                                    .foregroundColor(.cyan)
-                                                Text("\(String(format: "%.0f", bpm)) BPM")
-                                                    .font(.system(.caption2, design: .rounded))
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(.white.opacity(0.9))
-                                            }
-                                            .techBadge()
-                                        }
+                                        .techBadge()
                                     }
                                     
-                                    // Energy & Danceability with visual meters - more compact
-                                    if viewModel.latestTrack?.energy != nil || viewModel.latestTrack?.danceability != nil {
-                                        HStack(spacing: 10) {
-                                            if let energy = viewModel.latestTrack?.energy {
-                                                VStack(spacing: 3) {
-                                                    HStack(spacing: 4) {
-                                                        Image(systemName: "bolt.fill")
-                                                            .font(.system(size: 11, weight: .semibold))
-                                                            .foregroundColor(.yellow)
-                                                        Text("Energy")
-                                                            .font(.system(.caption2, design: .rounded))
-                                                            .fontWeight(.medium)
-                                                            .foregroundColor(.white.opacity(0.9))
-                                                    }
-                                                    
-                                                    // Energy meter
-                                                    ZStack(alignment: .leading) {
-                                                        Capsule()
-                                                            .frame(width: 60, height: 3)
-                                                            .foregroundColor(Color.gray.opacity(0.3))
-                                                        
-                                                        Capsule()
-                                                            .frame(width: 60 * CGFloat(energy), height: 3)
-                                                            .foregroundStyle(
-                                                                LinearGradient(
-                                                                    colors: [.yellow, .orange],
-                                                                    startPoint: .leading,
-                                                                    endPoint: .trailing
-                                                                )
-                                                            )
-                                                    }
-                                                }
-                                                .techBadge()
-                                            }
-                                            
-                                            if let danceability = viewModel.latestTrack?.danceability {
-                                                VStack(spacing: 3) {
-                                                    HStack(spacing: 4) {
-                                                        Image(systemName: "figure.dance")
-                                                            .font(.system(size: 11, weight: .semibold))
-                                                            .foregroundColor(.pink)
-                                                        Text("Dance")
-                                                            .font(.system(.caption2, design: .rounded))
-                                                            .fontWeight(.medium)
-                                                            .foregroundColor(.white.opacity(0.9))
-                                                    }
-                                                    
-                                                    // Danceability meter
-                                                    ZStack(alignment: .leading) {
-                                                        Capsule()
-                                                            .frame(width: 60, height: 3)
-                                                            .foregroundColor(Color.gray.opacity(0.3))
-                                                        
-                                                        Capsule()
-                                                            .frame(width: 60 * CGFloat(danceability), height: 3)
-                                                            .foregroundStyle(
-                                                                LinearGradient(
-                                                                    colors: [.pink, .purple],
-                                                                    startPoint: .leading,
-                                                                    endPoint: .trailing
-                                                                )
-                                                            )
-                                                    }
-                                                }
-                                                .techBadge()
-                                            }
-                                        }
-                                    }
+                                    // Les indicateurs BPM, Energy et Danceability ont été supprimés car
+                                    // l'API ne fournit pas ces informations de manière fiable
                                 }
                             }
                             .padding(.horizontal, 20)
+                            
+                            // Affichage des prompts
+                            if case .idle = viewModel.llmState {
+                                // Ne rien afficher si état idle
+                            } else {
+                                VStack(spacing: 8) {
+                                    switch viewModel.llmState {
+                                    case .generating:
+                                        HStack {
+                                            ProgressView()
+                                                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                                            Text("Génération des prompts...")
+                                                .foregroundColor(.blue)
+                                        }
+                                        .padding()
+                                        
+                                    case .error(let message):
+                                        Text(message)
+                                            .foregroundColor(.red)
+                                            .padding()
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(Color.red.opacity(0.1))
+                                            )
+                                            .padding(.horizontal)
+                                            
+                                    case .success:
+                                        PromptDisplayView(llmManager: LLMManager.shared, recognitionViewModel: viewModel)
+                                            .transition(.opacity)
+                                            
+                                    case .idle:
+                                        EmptyView()
+                                    }
+                                }
+                                .animation(.easeInOut, value: viewModel.llmState)
+                            }
                             
                             // Spacer to push everything up and leave space before the text entry bar
                             Spacer()
@@ -787,6 +782,42 @@ struct ContentView: View {
             return "Ethernet"
         case .unknown:
             return "Connected"
+        }
+    }
+    
+    // Function to simulate detection of a specific track
+    private func simulateTrackDetection() {
+        let testTrack = TrackInfo(
+            title: "Pass This On",
+            artist: "The Knife",
+            artworkURL: URL(string: "https://i.scdn.co/image/ab67616d0000b27320feadae116e4b306d58d69c"),
+            genre: "Electronic",
+            bpm: nil,
+            energy: nil,
+            danceability: nil
+        )
+        
+        // Mise à jour de l'interface
+        viewModel.latestTrack = testTrack
+        
+        // Animation de détection réussie
+        withAnimation {
+            trackIdentified = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                trackIdentified = false
+            }
+        }
+        
+        // Envoi OSC si configuré
+        Task {
+            await viewModel.sendTestTrackInfo(track: testTrack)
+            
+            // Déclencher la génération des prompts LLM si configuré
+            if SettingsManager.shared.hasValidLLMConfig {
+                viewModel.llmState = .generating
+                await viewModel.llmManager.generatePrompts(for: testTrack)
+                viewModel.handleLLMState()
+            }
         }
     }
 } // End struct ContentView

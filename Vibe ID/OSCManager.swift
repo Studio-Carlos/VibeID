@@ -20,55 +20,53 @@
 import Foundation
 import OSCKit
 import Darwin
+import Combine
 
 @MainActor
 class OSCManager {
 
-    private let oscClient = OSCClient()
-
+    // Shared instance for LLM prompts
+    private let llmManager = LLMManager.shared
+    
+    // Store cancellables
+    private var cancellables = Set<AnyCancellable>()
+    
+    // Current state
+    private(set) var isConnected = true
+    private let oscClient = OSCKit.OSCClient()
+    
     // Enable detailed logging
     private var verboseLogging: Bool = true
 
     init() {
-        print("OSCManager Initialized")
+        // OSCManager initialized
+    }
+
+    // MARK: - OSC Message Operations
+    
+    /// Sends a manual prompt with custom parameters
+    func sendManualPrompt(prompt: String, host: String, port: Int) {
+        let oscAddress = "/vibeid/manual"
+        let customMessage = OSCKit.OSCMessage(OSCKit.OSCAddressPattern(oscAddress), values: [prompt])
+        send(customMessage, to: host, port: port)
     }
 
     /// Sends a single OSC message in a simple and direct way.
-    func send(_ message: OSCMessage, to host: String, port: Int) {
+    func send(_ message: OSCKit.OSCMessage, to host: String, port: Int) {
         guard !host.isEmpty, port > 0, port <= 65535 else {
-            print("OSCManager Error: Host (\(host)) or Port (\(port)) invalid.")
             return
         }
         
-        print("OSCManager: Sending message \(message.addressPattern) to \(host):\(port)")
-        
-        // Display message values if verbose logging is enabled
-        if verboseLogging {
-            let valuesString = message.values.map { 
-                if let strVal = $0 as? String {
-                    return "\"\(strVal)\""
-                } else {
-                    return "\($0)"
-                }
-            }.joined(separator: ", ")
-            
-            print("OSCManager DEBUG: Sending \(message.addressPattern) -> [\(valuesString)]")
-        }
-        
-        // Direct synchronous approach that has worked in previous versions
+        // Direct synchronous approach
         do {
             try oscClient.send(message, to: host, port: UInt16(port))
-            print("OSCManager: Message sent successfully")
         } catch {
-            print("OSCManager: ERROR sending OSC: \(error.localizedDescription)")
-            
             // Try a second time after a short delay
             do {
                 Thread.sleep(forTimeInterval: 0.05)
                 try oscClient.send(message, to: host, port: UInt16(port))
-                print("OSCManager: Second attempt successful")
             } catch {
-                print("OSCManager: COMPLETE FAILURE sending OSC: \(error.localizedDescription)")
+                // Failed both attempts
             }
         }
     }
@@ -76,110 +74,85 @@ class OSCManager {
     /// Tests the OSC connection by sending a simple message.
     func testConnection(to host: String, port: Int) -> Bool {
         guard !host.isEmpty, port > 0, port <= 65535 else {
-            print("OSCManager Test: Invalid configuration")
             return false
         }
         
-        print("OSCManager: Testing OSC connection to \(host):\(port)")
-        
         // Create a simple test message
-        let testMsg = OSCMessage(OSCAddressPattern("/vibeid/test"), values: ["ping"])
+        let testMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/test"), values: ["ping"])
         
         do {
             try oscClient.send(testMsg, to: host, port: UInt16(port))
-            print("OSCManager: Connection test successful")
             return true
         } catch {
-            print("OSCManager: Connection test FAILED: \(error.localizedDescription)")
             return false
         }
     }
 
     /// Sends identified track information via OSC.
     func sendTrackInfo(track: TrackInfo, host: String, port: Int) {
-        print("OSCManager: Sending track info via OSC")
+        // Send basic track information
+        let titleMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/title"), values: [track.title ?? ""])
+        send(titleMsg, to: host, port: port)
         
-        // Verify validity
-        guard !host.isEmpty, port > 0, port <= 65535 else {
-            print("OSCManager: Invalid OSC configuration for sendTrackInfo")
-            return
+        let artistMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/artist"), values: [track.artist ?? ""])
+        send(artistMsg, to: host, port: port)
+        
+        let genreMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/genre"), values: [track.genre ?? ""])
+        send(genreMsg, to: host, port: port)
+        
+        let artworkMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/artwork"), values: [track.artworkURL?.absoluteString ?? ""])
+        send(artworkMsg, to: host, port: port)
+        
+        // Send prompts
+        if let prompt1 = track.prompt1 {
+            let prompt1Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt1"), values: [prompt1])
+            send(prompt1Msg, to: host, port: port)
         }
-        
-        // Send title
-        if let title = track.title {
-            let addr = OSCAddressPattern("/vibeid/track/title")
-            let titleMsg = OSCMessage(addr, values: [title])
-            send(titleMsg, to: host, port: port)
+        if let prompt2 = track.prompt2 {
+            let prompt2Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt2"), values: [prompt2])
+            send(prompt2Msg, to: host, port: port)
         }
-        
-        // Send artist
-        if let artist = track.artist {
-            let addr = OSCAddressPattern("/vibeid/track/artist")
-            let artistMsg = OSCMessage(addr, values: [artist])
-            send(artistMsg, to: host, port: port)
+        if let prompt3 = track.prompt3 {
+            let prompt3Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt3"), values: [prompt3])
+            send(prompt3Msg, to: host, port: port)
         }
-        
-        // Send genre
-        if let genre = track.genre, !genre.isEmpty {
-            let addr = OSCAddressPattern("/vibeid/track/genre")
-            let genreMsg = OSCMessage(addr, values: [genre])
-            send(genreMsg, to: host, port: port)
+        if let prompt4 = track.prompt4 {
+            let prompt4Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt4"), values: [prompt4])
+            send(prompt4Msg, to: host, port: port)
         }
-        
-        // Send BPM
-        if let bpm = track.bpm {
-            let addr = OSCAddressPattern("/vibeid/track/bpm")
-            let bpmMsg = OSCMessage(addr, values: [Float(bpm)])
-            send(bpmMsg, to: host, port: port)
+        if let prompt5 = track.prompt5 {
+            let prompt5Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt5"), values: [prompt5])
+            send(prompt5Msg, to: host, port: port)
         }
-        
-        // Send energy
-        if let energy = track.energy {
-            let addr = OSCAddressPattern("/vibeid/track/energy")
-            let energyMsg = OSCMessage(addr, values: [Float(energy)])
-            send(energyMsg, to: host, port: port)
+        if let prompt6 = track.prompt6 {
+            let prompt6Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt6"), values: [prompt6])
+            send(prompt6Msg, to: host, port: port)
         }
-        
-        // Send danceability
-        if let danceability = track.danceability {
-            let addr = OSCAddressPattern("/vibeid/track/danceability")
-            let danceabilityMsg = OSCMessage(addr, values: [Float(danceability)])
-            send(danceabilityMsg, to: host, port: port)
+        if let prompt7 = track.prompt7 {
+            let prompt7Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt7"), values: [prompt7])
+            send(prompt7Msg, to: host, port: port)
         }
-        
-        // Send artwork URL
-        if let artworkURL = track.artworkURL?.absoluteString {
-            let addr = OSCAddressPattern("/vibeid/track/artwork")
-            let artworkMsg = OSCMessage(addr, values: [artworkURL])
-            send(artworkMsg, to: host, port: port)
+        if let prompt8 = track.prompt8 {
+            let prompt8Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt8"), values: [prompt8])
+            send(prompt8Msg, to: host, port: port)
         }
-        
-        print("OSCManager: Track info sending completed.")
+        if let prompt9 = track.prompt9 {
+            let prompt9Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt9"), values: [prompt9])
+            send(prompt9Msg, to: host, port: port)
+        }
+        if let prompt10 = track.prompt10 {
+            let prompt10Msg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/track/prompt10"), values: [prompt10])
+            send(prompt10Msg, to: host, port: port)
+        }
     }
 
-    /// Sends a manual prompt entered by the user via OSC.
-    func sendManualPrompt(prompt: String, host: String, port: Int) {
-        print("OSCManager: Sending manual prompt via OSC: \"\(prompt)\"")
-        
-        // Verify validity
-        guard !host.isEmpty, port > 0, port <= 65535 else {
-            print("OSCManager: Invalid OSC configuration for sendManualPrompt")
-            return
-        }
-        
-        // Standard format with prefix
-        let addr = OSCAddressPattern("/vibeid/prompt")
-        let promptMsg = OSCMessage(addr, values: [prompt])
-        send(promptMsg, to: host, port: port)
-    }
-    
     /// Sends a listening status message
     func sendStatusMessage(status: String, host: String, port: Int) {
         guard !host.isEmpty, port > 0, port <= 65535 else {
             return
         }
         
-        let statusMsg = OSCMessage(OSCAddressPattern("/vibeid/status"), values: [status])
+        let statusMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/status"), values: [status])
         send(statusMsg, to: host, port: port)
     }
     
@@ -189,7 +162,7 @@ class OSCManager {
             return
         }
         
-        let pingMsg = OSCMessage(OSCAddressPattern("/vibeid/test"), values: ["ping"])
+        let pingMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/test"), values: ["ping"])
         send(pingMsg, to: host, port: port)
     }
     
@@ -276,3 +249,4 @@ class OSCManager {
         return report
     }
 }
+

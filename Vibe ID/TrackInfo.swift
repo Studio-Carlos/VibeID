@@ -29,6 +29,18 @@ struct TrackInfo: Identifiable, Equatable {
     var bpm: Double?
     var energy: Double? // Energy (0.0 to 1.0)
     var danceability: Double? // Danceability (0.0 to 1.0)
+    
+    // Prompts générés par le LLM
+    var prompt1: String?
+    var prompt2: String?
+    var prompt3: String?
+    var prompt4: String?
+    var prompt5: String?
+    var prompt6: String?
+    var prompt7: String?
+    var prompt8: String?
+    var prompt9: String?
+    var prompt10: String?
 
     // Comparison based on title and artist
     static func == (lhs: TrackInfo, rhs: TrackInfo) -> Bool {

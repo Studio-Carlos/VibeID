@@ -78,7 +78,7 @@ class AudDAPIManager {
         }
 
         // Cancel previous task if it exists (safety)
-        cancelCurrentRequest()
+        cancelRequest()
 
         // 1. Create request and multipart body
         var request = URLRequest(url: apiURL)
@@ -190,7 +190,7 @@ class AudDAPIManager {
     } // End func recognize
 
     /// Cancels the current AudD network request, if it exists.
-    func cancelCurrentRequest() {
+    func cancelRequest() {
         // Can be called from any thread, but currentTask is managed on main via defer
         print("AudDAPIManager: Request cancellation requested...")
         currentTask?.cancel()
@@ -245,6 +245,20 @@ class AudDAPIManager {
         case "m4a": return "audio/mp4"
         case "mp3": return "audio/mpeg"
         default: return "application/octet-stream"
+        }
+    }
+
+    /// Identifies a song from a local audio file using async/await
+    func recognizeAsync(audioFileURL: URL, apiKey: String, returnParams: String? = "apple_music,spotify") async throws -> AudDResult? {
+        return try await withCheckedThrowingContinuation { continuation in
+            recognize(audioFileURL: audioFileURL, apiKey: apiKey, returnParams: returnParams) { result in
+                switch result {
+                case .success(let audDResult):
+                    continuation.resume(returning: audDResult)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
         }
     }
 

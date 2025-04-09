@@ -64,14 +64,14 @@ func sendAppStartedMessage() async {
         
         // Only send messages in standard format
         oscManager.send(
-            OSCMessage(OSCAddressPattern("/vibeid/status"), values: ["app_started"]),
+            OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/status"), values: ["app_started"]),
             to: settingsManager.oscHost,
             port: settingsManager.oscPort
         )
         
         // Also send a test ping
         oscManager.send(
-            OSCMessage(OSCAddressPattern("/vibeid/test"), values: ["ping"]),
+            OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/test"), values: ["ping"]),
             to: settingsManager.oscHost,
             port: settingsManager.oscPort
         )

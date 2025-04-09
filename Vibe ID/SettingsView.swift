@@ -40,6 +40,11 @@ struct SettingsView: View {
     @State private var diagnosticReport: String = ""
     @State private var isDiagnosing: Bool = false
 
+    // State for LLM test alerts
+    @State private var showingAlert: Bool = false
+    @State private var alertTitle: String = ""
+    @State private var alertMessage: String = ""
+
     // Environment to close modal sheet
     @Environment(\.dismiss) var dismiss
     
@@ -187,6 +192,45 @@ struct SettingsView: View {
                     )
                 }
 
+                // Section for LLM Configuration
+                Section(header: Text("Configuration LLM").foregroundColor(.blue)) {
+                    Picker("Modèle", selection: $settings.selectedLLM) {
+                        ForEach(LLMType.allCases, id: \.self) { model in
+                            Text(model.rawValue).tag(model)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    
+                    SecureField("Clé API", text: selectedLLMAPIKey)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    VStack(alignment: .leading) {
+                        Text("Système Prompt (en anglais)")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        
+                        TextEditor(text: $settings.llmSystemPrompt)
+                            .frame(minHeight: 250) // Hauteur augmentée pour voir plus de contenu
+                            .padding(8)
+                            .background(Color.black.opacity(0.3))
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                            )
+                    }
+                    
+                    Button(action: testLLMConnection) {
+                        HStack {
+                            Image(systemName: "bolt.fill")
+                            Text("Tester la connexion")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!settings.hasValidLLMConfig)
+                }
+
             } // End Form
             .scrollContentBackground(.hidden) // Make form background transparent
             .background(
@@ -215,6 +259,7 @@ struct SettingsView: View {
             }
             // Load initial API key into text field when view appears
             .onAppear {
+                // Synchroniser le champ d'entrée avec l'API key de AudD
                 apiKeyInput = settings.apiKey ?? ""
             }
             // Add modal sheet for diagnostic report
@@ -250,8 +295,49 @@ struct SettingsView: View {
             }
         } // End NavigationStack
         .preferredColorScheme(.dark)
+        .alert(isPresented: $showingAlert) {
+            Alert(
+                title: Text(alertTitle),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     } // End body
-} // End struct SettingsView
+
+    // Helper function to get the correct API key binding based on selected LLM
+    private var selectedLLMAPIKey: Binding<String> {
+        switch settings.selectedLLM {
+        case .deepseek:
+            return $settings.deepseekAPIKey
+        case .claude:
+            return $settings.claudeAPIKey
+        case .chatGPT:
+            return $settings.chatGPTAPIKey
+        }
+    }
+
+    // Helper function to test LLM connection
+    private func testLLMConnection() {
+        Task {
+            do {
+                // Utiliser la méthode publique testLLMConnection de LLMManager
+                try await LLMManager.shared.testLLMConnection()
+                
+                await MainActor.run {
+                    showingAlert = true
+                    alertTitle = "Succès"
+                    alertMessage = "Connexion à l'API LLM établie avec succès"
+                }
+            } catch {
+                await MainActor.run {
+                    showingAlert = true
+                    alertTitle = "Erreur"
+                    alertMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+}
 
 // Extension to configure the sheet presentation in dark mode
 extension View {

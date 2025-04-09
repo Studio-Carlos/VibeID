@@ -32,6 +32,8 @@ class SettingsManager: ObservableObject {
     private let defaultOSCHost = "127.0.0.1"
     private let defaultOSCPort = 9000
     private let defaultRecognitionFrequencyMinutes = 5
+    private let defaultAudDAPIKey = ""
+    private let defaultDeepSeekAPIKey = ""
 
     // UserDefaults keys
     private let apiKeyKey = "audApiKey"
@@ -45,6 +47,11 @@ class SettingsManager: ObservableObject {
     @Published var oscPort: Int = 9000
     @Published var recognitionFrequencyMinutes: Int = 5
     @Published var apiKey: String? = nil
+    @Published var selectedLLM: LLMType = .deepseek
+    @Published var deepseekAPIKey: String = ""
+    @Published var claudeAPIKey: String = ""
+    @Published var chatGPTAPIKey: String = ""
+    @Published var llmSystemPrompt: String = ""
 
     // Private initializer (Singleton pattern)
     private init() {
@@ -52,7 +59,7 @@ class SettingsManager: ObservableObject {
         let defaults = UserDefaults.standard
         
         // Initialize properties
-        self.apiKey = defaults.string(forKey: apiKeyKey)
+        self.apiKey = defaults.string(forKey: apiKeyKey) ?? defaultAudDAPIKey
         self.oscHost = defaults.string(forKey: oscHostKey) ?? defaultOSCHost
         self.oscPort = defaults.integer(forKey: oscPortKey)
         
@@ -67,7 +74,59 @@ class SettingsManager: ObservableObject {
             self.recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
         }
         
-        print("[SettingsManager] Initialized with OSC config: \(oscHost):\(oscPort)")
+        selectedLLM = LLMType(rawValue: UserDefaults.standard.string(forKey: "selectedLLM") ?? "") ?? .deepseek
+        deepseekAPIKey = UserDefaults.standard.string(forKey: "deepseekAPIKey") ?? defaultDeepSeekAPIKey
+        claudeAPIKey = UserDefaults.standard.string(forKey: "claudeAPIKey") ?? ""
+        chatGPTAPIKey = UserDefaults.standard.string(forKey: "chatGPTAPIKey") ?? ""
+        llmSystemPrompt = UserDefaults.standard.string(forKey: "llmSystemPrompt") ?? """
+Focus on:
+
+    * Lyrics and their themes/meanings.
+
+    * The visual aesthetics and content of the official music video (if one exists).
+
+    * The design and style of the album/single cover art.
+
+    * Visuals typically associated with the artist or this track during live performances (if information is available).
+
+    * The overall mood ("vibe"), atmosphere, and emotion conveyed by the music.
+
+    * What the track narrates or evokes (story, abstract concepts).
+
+    * Common interpretations or notable analyses found in articles, reviews, or discussions.
+
+    * The music genre and its associated visual codes.
+
+
+2.  **Creative Synthesis:** Analyze and synthesize all the collected information to build a deep and nuanced understanding of the track's musical and visual identity.
+
+
+3.  **Prompt Generation (Stable Diffusion 1.5):** Generate exactly 10 distinct image prompts suitable for Stable Diffusion 1.5. These prompts must strictly adhere to the following:
+
+    * Be directly inspired by your research findings (lyrics, video, cover art, mood, etc.).
+
+    * Explore different aspects, themes, or moments of the track.
+
+    * Maintain a **coherent artistic direction** across all 10 prompts, aligned with the overall mood and aesthetics identified in your research.
+
+    * Be **detailed and evocative**, using precise keywords to guide Stable Diffusion. Incorporate elements such as:
+
+        * **Subject:** The central element of the image (characters, objects, abstract scenes...).
+
+        * **Medium:** photograph, cinematic still, oil painting, illustration, 3D render, concept art, glitch art, abstract visualization, etc.
+
+        * **Style:** hyperrealistic, surrealist, impressionist, cyberpunk, gothic, minimalist, psychedelic, noir, vintage, futuristic, [Relevant artist or movement name] style.
+
+        * **Lighting:** dramatic lighting, soft lighting, neon glow, volumetric lighting, backlit, chiaroscuro.
+
+        * **Color Palette:** vibrant colors, monochromatic, pastel palette, dark moody colors, saturated, desaturated.
+
+        * **Additional Details:** detailed texture, bokeh, motion blur, wide angle shot, macro shot, epic scale, intricate details.
+
+    * Vary the **core subject matter** from one prompt to the next while maintaining stylistic coherence.
+"""
+        
+        // Settings initialized
     }
     
     // Saves all settings to UserDefaults
@@ -88,7 +147,14 @@ class SettingsManager: ObservableObject {
         // Save recognition frequency
         defaults.set(recognitionFrequencyMinutes, forKey: recognitionFrequencyKey)
         
-        print("[SettingsManager] Settings saved")
+        // Save LLM settings
+        defaults.set(selectedLLM.rawValue, forKey: "selectedLLM")
+        defaults.set(deepseekAPIKey, forKey: "deepseekAPIKey")
+        defaults.set(claudeAPIKey, forKey: "claudeAPIKey")
+        defaults.set(chatGPTAPIKey, forKey: "chatGPTAPIKey")
+        defaults.set(llmSystemPrompt, forKey: "llmSystemPrompt")
+        
+        // Settings saved to UserDefaults
     }
     
     // Returns true if the app has a valid API key configured
@@ -104,11 +170,80 @@ class SettingsManager: ObservableObject {
 
     // Reset all settings to defaults
     func resetToDefaults() {
-        apiKey = nil
+        apiKey = defaultAudDAPIKey
         oscHost = defaultOSCHost
         oscPort = defaultOSCPort
         recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
-        print("[SettingsManager] All settings reset to defaults")
+        selectedLLM = .deepseek
+        deepseekAPIKey = defaultDeepSeekAPIKey
+        claudeAPIKey = ""
+        chatGPTAPIKey = ""
+        llmSystemPrompt = """
+Focus on:
+
+    * Lyrics and their themes/meanings.
+
+    * The visual aesthetics and content of the official music video (if one exists).
+
+    * The design and style of the album/single cover art.
+
+    * Visuals typically associated with the artist or this track during live performances (if information is available).
+
+    * The overall mood ("vibe"), atmosphere, and emotion conveyed by the music.
+
+    * What the track narrates or evokes (story, abstract concepts).
+
+    * Common interpretations or notable analyses found in articles, reviews, or discussions.
+
+    * The music genre and its associated visual codes.
+
+
+2.  **Creative Synthesis:** Analyze and synthesize all the collected information to build a deep and nuanced understanding of the track's musical and visual identity.
+
+
+3.  **Prompt Generation (Stable Diffusion 1.5):** Generate exactly 10 distinct image prompts suitable for Stable Diffusion 1.5. These prompts must strictly adhere to the following:
+
+    * Be directly inspired by your research findings (lyrics, video, cover art, mood, etc.).
+
+    * Explore different aspects, themes, or moments of the track.
+
+    * Maintain a **coherent artistic direction** across all 10 prompts, aligned with the overall mood and aesthetics identified in your research.
+
+    * Be **detailed and evocative**, using precise keywords to guide Stable Diffusion. Incorporate elements such as:
+
+        * **Subject:** The central element of the image (characters, objects, abstract scenes...).
+
+        * **Medium:** photograph, cinematic still, oil painting, illustration, 3D render, concept art, glitch art, abstract visualization, etc.
+
+        * **Style:** hyperrealistic, surrealist, impressionist, cyberpunk, gothic, minimalist, psychedelic, noir, vintage, futuristic, [Relevant artist or movement name] style.
+
+        * **Lighting:** dramatic lighting, soft lighting, neon glow, volumetric lighting, backlit, chiaroscuro.
+
+        * **Color Palette:** vibrant colors, monochromatic, pastel palette, dark moody colors, saturated, desaturated.
+
+        * **Additional Details:** detailed texture, bokeh, motion blur, wide angle shot, macro shot, epic scale, intricate details.
+
+    * Vary the **core subject matter** from one prompt to the next while maintaining stylistic coherence.
+"""
+        // Settings reset to defaults
+    }
+
+    // Returns true if LLM configuration is valid
+    var hasValidLLMConfig: Bool {
+        let apiKey = getCurrentLLMAPIKey()
+        return !apiKey.isEmpty && !llmSystemPrompt.isEmpty
+    }
+
+    // Returns the current LLM API key
+    func getCurrentLLMAPIKey() -> String {
+        switch selectedLLM {
+        case .deepseek:
+            return deepseekAPIKey
+        case .claude:
+            return claudeAPIKey
+        case .chatGPT:
+            return chatGPTAPIKey
+        }
     }
 
 } // End of SettingsManager class

@@ -141,6 +141,20 @@ class AudioCaptureManager: ObservableObject {
          tapFormat = hardwareFormat
     }
 
+    /// Records a short audio snippet to a temporary file with async/await
+    func recordSnippet() async throws -> URL {
+        return try await withCheckedThrowingContinuation { continuation in
+            recordSnippet { result in
+                switch result {
+                case .success(let url):
+                    continuation.resume(returning: url)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
     /// Records a short audio snippet to a temporary file.
     func recordSnippet(completion: @escaping (Result<URL, Error>) -> Void) {
         print("AudioCaptureManager: Starting recordSnippet...")

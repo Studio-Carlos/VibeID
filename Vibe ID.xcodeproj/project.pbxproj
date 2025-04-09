@@ -16,9 +16,22 @@
 		07199AAC2DA13B06003C862C /* Vibe ID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe ID.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		07CB0B0D2DA6781100D30D44 /* Exceptions for "Vibe ID" folder in "Vibe ID" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Vibe-ID-Info.plist",
+			);
+			target = 07199AAB2DA13B06003C862C /* Vibe ID */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07199AAE2DA13B06003C862C /* Vibe ID */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				07CB0B0D2DA6781100D30D44 /* Exceptions for "Vibe ID" folder in "Vibe ID" target */,
+			);
 			path = "Vibe ID";
 			sourceTree = "<group>";
 		};
@@ -41,8 +54,6 @@
 		07199AA32DA13B06003C862C = {
 			isa = PBXGroup;
 			children = (
-				E7DDB3D82BB2DF2C009F9BDC /* LICENSE */,
-				E76AF7D62BAA32E10025F1C1 /* Vibe-ID-Info.plist */,
 				07199AAE2DA13B06003C862C /* Vibe ID */,
 				07199AAD2DA13B06003C862C /* Products */,
 			);
@@ -274,7 +285,7 @@
 				DEVELOPMENT_TEAM = PGLVYH2292;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Vibe-ID-Info.plist";
+				INFOPLIST_FILE = "Vibe ID/Vibe-ID-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Vibe ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Track ID";
@@ -307,7 +318,7 @@
 				DEVELOPMENT_TEAM = PGLVYH2292;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Vibe-ID-Info.plist";
+				INFOPLIST_FILE = "Vibe ID/Vibe-ID-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Vibe ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Track ID";
