@@ -29,10 +29,20 @@ class RecognitionViewModel: ObservableObject {
 
     @Published var isListening: Bool = false
     @Published var isPerformingIdentification: Bool = false
-    @Published var statusMessage: String = "Prêt à identifier"
+    @Published var statusMessage: String = "Ready to identify"
     @Published var latestTrack: TrackInfo? = nil
     @Published var timeUntilNextIdentification: Int? = nil
     @Published var llmState: LLMState = .idle
+    
+    // Property to easily access the current TrackInfo
+    var currentTrackInfo: TrackInfo? {
+        return latestTrack
+    }
+    
+    // Check if the current source is OSC
+    var isOSCSourceActive: Bool {
+        return latestTrack?.source == .osc
+    }
 
     enum LLMState: Equatable {
         case idle
@@ -49,7 +59,7 @@ class RecognitionViewModel: ObservableObject {
             case (.error(let lhsMsg), .error(let rhsMsg)):
                 return lhsMsg == rhsMsg
             case (.success(let lhsPrompts), .success(let rhsPrompts)):
-                // Maintenant que LLMPrompt est Equatable, on peut comparer les tableaux directement
+                // Now that LLMPrompt is Equatable, we can compare arrays directly
                 return lhsPrompts == rhsPrompts
             default:
                 return false
@@ -64,17 +74,100 @@ class RecognitionViewModel: ObservableObject {
     private let audioManager = AudioCaptureManager()
     private let apiManager = AudDAPIManager()
     private let settingsManager = SettingsManager.shared
-    private let oscManager = OSCManager()
+    private let oscManager = OSCService.shared.getOSCManager()
     // LLM Manager for prompt generation
     public let llmManager = LLMManager.shared
+    
+    // For storing cancellations
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         print("RecognitionViewModel Initialized")
+        
+        // Subscribe to track notifications received via OSC
+        oscManager.trackReceivedPublisher
+            .sink { [weak self] trackInfo in
+                self?.handleExternalTrackInfo(trackInfo)
+            }
+            .store(in: &cancellables)
     }
 
     deinit {
         // Standard cleanup
         print("RecognitionViewModel deinit")
+        cancellables.removeAll()
+    }
+    
+    // Method to process track information received by OSC
+    private func handleExternalTrackInfo(_ trackInfo: TrackInfo) {
+        print("RecognitionViewModel: Received external track info via OSC - Title: \(trackInfo.title ?? "Unknown"), Artist: \(trackInfo.artist ?? "Unknown")")
+        
+        // Update the UI with the new information
+        latestTrack = trackInfo
+        
+        // Update status
+        statusMessage = "Track received via OSC"
+        
+        // Reset AudD identification timers if in listening mode
+        if isListening {
+            resetIdentificationTimers()
+        }
+        
+        // Generate LLM prompts for the track if the configuration is valid
+        if settingsManager.hasValidLLMConfig {
+            print("RecognitionViewModel: Generating LLM prompts for OSC-received track")
+            Task {
+                // Set state as generating to display animation
+                llmState = .generating
+                
+                // Generate prompts in the background
+                await llmManager.generatePrompts(for: trackInfo)
+                handleLLMState()
+                
+                // Send updated information via OSC
+                if let updatedTrack = latestTrack {
+                    await sendTrackInfo(track: updatedTrack)
+                }
+            }
+        }
+    }
+    
+    // Reset identification timers
+    private func resetIdentificationTimers() {
+        print("RecognitionViewModel: Resetting identification timers after OSC track reception")
+        
+        // Stop existing timers
+        stopIdentificationTimer()
+        stopDisplayTimer()
+        
+        // Reset countdown
+        timeUntilNextIdentification = settingsManager.recognitionFrequencyMinutes * 60
+        
+        // Restart timers for the next AudD identification cycle
+        startDisplayTimer()
+    }
+    
+    // Start only the display timer without immediately starting an identification
+    private func startDisplayTimer() {
+        displayTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self = self, self.isListening else {
+                    self?.stopDisplayTimer()
+                    return
+                }
+                
+                if let currentCountdown = self.timeUntilNextIdentification {
+                    if currentCountdown > 0 {
+                        self.timeUntilNextIdentification = currentCountdown - 1
+                    } else {
+                        // Once the countdown is finished, start an identification
+                        self.performIdentification()
+                        self.timeUntilNextIdentification = self.settingsManager.recognitionFrequencyMinutes * 60
+                    }
+                }
+            }
+        }
+        print("RecognitionViewModel: Display timer started for next AudD identification")
     }
 
     // --- UI Actions ---
@@ -218,11 +311,11 @@ class RecognitionViewModel: ObservableObject {
          print("RecognitionViewModel: Cancellation request to AudDAPIManager...")
         apiManager.cancelRequest()
         
-        // Réinitialiser l'état lorsque nous arrêtons l'écoute
+        // Reset state when we stop listening
         isPerformingIdentification = false
         
-        // Important: Quand nous arrêtons l'écoute, ne pas réinitialiser la liste des prompts
-        // mais réinitialiser l'état du LLM pour que l'interface reflète le bon état
+        // Important: When we stop listening, do not reset the list of prompts
+        // but reset the LLM state so the interface reflects the correct state
         llmState = .idle
         
         // Stop and invalidate timers
@@ -235,7 +328,7 @@ class RecognitionViewModel: ObservableObject {
 
      private func performIdentification() {
          print("--- performIdentification called ---")
-        // Initialiser OSCManager
+        // Initialize OSCManager
         _ = OSCManager()
         
         guard !isPerformingIdentification else {
@@ -245,7 +338,7 @@ class RecognitionViewModel: ObservableObject {
 
         isPerformingIdentification = true
         latestTrack = nil
-        // Réinitialiser l'état du LLM
+        // Reset LLM state
         llmState = .idle
         
         // Reset countdown timer
@@ -267,17 +360,18 @@ class RecognitionViewModel: ObservableObject {
                 if let audDResult = result {
                     print("Song identified: \(audDResult.title ?? "Unknown")")
                     
-                    // Convertir AudDResult en TrackInfo
+                    // Convert AudDResult to TrackInfo
                     let track = TrackInfo(
                         title: audDResult.title,
                         artist: audDResult.artist,
+                        genre: audDResult.estimatedGenre,
                         artworkURL: audDResult.spotify?.album?.images?.first?.url != nil ?
                             URL(string: audDResult.spotify?.album?.images?.first?.url ?? "") :
                             audDResult.apple_music?.artwork?.artworkURL(width: 300, height: 300),
-                        genre: audDResult.estimatedGenre,
                         bpm: audDResult.estimatedBpm,
                         energy: audDResult.estimatedEnergy,
-                        danceability: audDResult.estimatedDanceability
+                        danceability: audDResult.estimatedDanceability,
+                        source: .audD // Specify source as AudD
                     )
                     
                     // Update the UI with the identified track
@@ -292,13 +386,13 @@ class RecognitionViewModel: ObservableObject {
                     if SettingsManager.shared.hasValidLLMConfig {
                         print("OSCManager Initialized")
                         
-                        // Définir l'état comme générant pour afficher l'animation
+                        // Set state as generating to display animation
                         llmState = .generating
                         
-                        // Générer les prompts en arrière-plan
+                        // Generate prompts in the background
                         Task {
-                            // Attente pour montrer l'animation
-                            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde pour voir l'animation
+                            // Wait to show animation
+                            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second to see animation
                             
                             do {
                                 await llmManager.generatePrompts(for: track)
@@ -336,33 +430,55 @@ class RecognitionViewModel: ObservableObject {
                                     port: settingsManager.oscPort)
     } // End func sendTestOSCMessage
     
+    /// Send a generic OSC message with the specified address and values
+    func sendOscMessage(address: String, values: [Any]) {
+        guard settingsManager.hasValidOSCConfig else {
+            print("RecognitionViewModel: Invalid OSC configuration, message not sent")
+            return
+        }
+        
+        // Use existing OSCManager methods directly
+        if address == "/vibeid/status" && values.count == 1, let status = values[0] as? String {
+            // For status messages, use sendStatusMessage
+            oscManager.sendStatusMessage(status: status, 
+                                        host: settingsManager.oscHost, 
+                                        port: settingsManager.oscPort)
+        } else if address == "/vibeid/test" {
+            // For test/ping messages
+            oscManager.sendPing(to: settingsManager.oscHost, port: settingsManager.oscPort)
+        } else {
+            // For other unhandled messages, simply log them
+            print("RecognitionViewModel: Unhandled OSC message - Address: \(address), Values: \(values)")
+        }
+    }
+    
    /// Sends track info via OSC if configured
    private func sendTrackInfo(track: TrackInfo) async {
-       print("RecognitionViewModel: Envoi des informations de la piste")
+       print("RecognitionViewModel: Sending track information")
        
-       // Vérifier la configuration OSC
+       // Check OSC configuration
        guard SettingsManager.shared.hasValidOSCConfig else {
-           print("RecognitionViewModel: Configuration OSC invalide")
+           print("RecognitionViewModel: Invalid OSC configuration")
            return
        }
        
-       // Envoyer les informations de la piste
+       // Send track information
        oscManager.sendTrackInfo(track: track, host: SettingsManager.shared.oscHost, port: SettingsManager.shared.oscPort)
    }
 
-   // Ajouter une méthode pour gérer les états LLM
+   // Add a method to handle LLM states
    public func handleLLMState() {
        Task { @MainActor in
            // Check if LLM is generating
            if llmManager.isGenerating {
-               print("RecognitionViewModel: Génération des prompts en cours...")
+               print("RecognitionViewModel: Generating prompts in progress...")
                llmState = .generating
                return
            }
            
            // Check if there's an error
            if let error = llmManager.errorMessage {
-               print("RecognitionViewModel: Erreur lors de la génération des prompts: \(error)")
+               print("RecognitionViewModel: Error during prompts generation: \(error)")
                llmState = .error(error)
                return
            }
@@ -370,9 +486,9 @@ class RecognitionViewModel: ObservableObject {
            // Check if prompts are available
            let prompts = llmManager.currentPrompts
            if !prompts.isEmpty {
-               print("RecognitionViewModel: \(prompts.count) prompts générés avec succès!")
+               print("RecognitionViewModel: \(prompts.count) prompts generated successfully!")
                
-               // Mettre à jour les prompts dans latestTrack
+               // Update prompts in latestTrack
                if var track = latestTrack {
                    for (index, prompt) in prompts.enumerated() {
                        switch index {
@@ -391,7 +507,7 @@ class RecognitionViewModel: ObservableObject {
                    }
                    latestTrack = track
                    
-                   // Envoyer les informations mises à jour via OSC
+                   // Send updated information via OSC
                    await sendTrackInfo(track: track)
                }
                
@@ -400,14 +516,14 @@ class RecognitionViewModel: ObservableObject {
            }
            
            // Default to idle
-           print("RecognitionViewModel: État LLM: idle")
+           print("RecognitionViewModel: LLM state: idle")
            llmState = .idle
        }
    }
 
    // Method to cancel ongoing identification
    func cancelIdentification() {
-       print("RecognitionViewModel: Annulation de l'identification en cours")
+       print("RecognitionViewModel: Cancelling ongoing identification")
        
        // Stop listening
        isListening = false
@@ -429,7 +545,7 @@ class RecognitionViewModel: ObservableObject {
    
    // Method to reset state
    func resetState() {
-       print("RecognitionViewModel: Réinitialisation de l'état")
+       print("RecognitionViewModel: Resetting state")
        
        // Reset state variables
        isListening = false
@@ -448,9 +564,9 @@ class RecognitionViewModel: ObservableObject {
        llmManager.currentPrompts = []
    }
    
-   // Method to simulate sending test track info
+   // Method to send test track info
    func sendTestTrackInfo(track: TrackInfo) async {
-       print("RecognitionViewModel: Envoi des informations de la piste de test")
+       print("RecognitionViewModel: Sending test track information")
        
        // Update current track
        latestTrack = track
@@ -458,34 +574,5 @@ class RecognitionViewModel: ObservableObject {
        // Send track information
        await sendTrackInfo(track: track)
    }
-
-   // Simulate prompt generation for testing
-   func simulatePromptGeneration(for track: TrackInfo) async {
-       // Create test prompts
-       var testPrompts: [LLMPrompt] = []
-       
-       // Example prompts for "Pass This On" by The Knife
-       let promptTexts = [
-           "A surreal digital illustration of disembodied hands passing objects in a dark room, featuring stark contrasts and minimalist composition, inspired by Swedish electronic music, cyberpunk aesthetics with neon accents against black backgrounds, by Josan Gonzalez",
-           "A mysterious figure in drag makeup performing in an empty room, cinematic photograph with harsh shadows and dramatic lighting, high contrast black and white, film noir style, inspired by early 2000s electronic music visuals",
-           "Abstract visualization of knife-like shapes cutting through layers of electronic sound waves, digital art with geometric patterns, vibrant blues and purples against dark background, glitch art aesthetics",
-           "Surreal photograph of identical twins wearing white masks in an abandoned building, symmetrical composition, desaturated colors with hints of cyan, inspired by Swedish electronic duo aesthetic"
-       ]
-       
-       // Create prompts
-       for (index, promptText) in promptTexts.enumerated() {
-           let prompt = LLMPrompt(
-               prompt: promptText,
-               parameters: ["prompt_number": index + 1]
-           )
-           testPrompts.append(prompt)
-       }
-       
-       // Update LLM manager
-       llmManager.currentPrompts = testPrompts
-       
-       // Update state to display prompts
-       llmState = .success(testPrompts)
-    }
 
 } // End of RecognitionViewModel class

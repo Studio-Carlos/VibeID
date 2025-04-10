@@ -1,0 +1,4 @@
+module OSCKitCore {
+header "OSCKitCore-Swift.h"
+export *
+}

@@ -1,0 +1,4 @@
+module SwiftASCII {
+header "SwiftASCII-Swift.h"
+export *
+}

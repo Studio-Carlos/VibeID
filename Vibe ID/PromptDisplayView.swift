@@ -28,15 +28,23 @@ struct PromptDisplayView: View {
     @State private var textWidth: CGFloat = .zero
     @State private var scrollViewWidth: CGFloat = .zero
     
-    // Timer for automatic prompt scrolling
-    let autoChangeTimer = Timer.publish(every: 8, on: .main, in: .common).autoconnect()
+    // Standard timer for automatic prompt change (replaces Timer.publish)
+    @State private var autoAdvanceTimer: Timer?
+    
+    // Uniform duration for animation and timer (16 seconds)
+    private let promptDuration: TimeInterval = 16.0
     
     var body: some View {
         promptContent
-            .onReceive(autoChangeTimer) { _ in
-                handleTimerTick()
-            }
             .padding(.vertical)
+            .onAppear {
+                // Starts the timer when the view appears
+                startAutoAdvanceTimer()
+            }
+            .onDisappear {
+                // Invalidates the timer when the view disappears
+                stopAutoAdvanceTimer()
+            }
     }
     
     // Main content
@@ -63,6 +71,7 @@ struct PromptDisplayView: View {
             
             // Scrolling content
             scrollingContent(for: prompt)
+                .id(currentPromptIndex) // Force view recreation on index change
         }
         .frame(height: 50)
         .padding(.horizontal, 16)
@@ -87,74 +96,74 @@ struct PromptDisplayView: View {
     
     // Scrolling content with text
     private func scrollingContent(for prompt: LLMPrompt) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 0) {
-                // Prompt number with distinct effect
-                Text("PROMPT \(currentPromptIndex + 1): ")
-                    .font(.system(.body, design: .rounded))
-                    .fontWeight(.bold)
-                    .foregroundColor(.cyan)
-                    .padding(.horizontal, 4)
-                
-                // Prompt text
-                Text(prompt.prompt)
-                    .font(.system(.body, design: .rounded))
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .background(GeometryReader { geo in
-                        Color.clear.onAppear {
-                            textWidth = geo.size.width
-                        }
-                    })
-                
-                // Espace avant répétition
-                Text("   •   ")
-                    .foregroundColor(.cyan)
-                    .fontWeight(.bold)
-                
-                // Répétition du texte pour effet continu
-                Text(prompt.prompt)
-                    .font(.system(.body, design: .rounded))
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .opacity(0.8)
+        GeometryReader { geo in
+            let containerWidth = geo.size.width
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) {
+                    // Prompt number with distinct effect
+                    Text("PROMPT \(currentPromptIndex + 1): ")
+                        .font(.system(.body, design: .rounded))
+                        .fontWeight(.bold)
+                        .foregroundColor(.cyan)
+                        .padding(.horizontal, 4)
+                    
+                    // Prompt text
+                    Text(prompt.prompt)
+                        .font(.system(.body, design: .rounded))
+                        .fontWeight(.medium)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .background(GeometryReader { geo in
+                            Color.clear.onAppear {
+                                textWidth = geo.size.width
+                            }
+                        })
+                    
+                    // Space and separator at the end of the text
+                    Text("   •   ")
+                        .foregroundColor(.cyan)
+                        .fontWeight(.bold)
+                    
+                    // Empty space at the end (instead of repeating the text)
+                    Text("")
+                        .frame(width: containerWidth)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 8)
+                .offset(x: scrollText ? -textWidth - 60 : 0)
+                .animation(
+                    Animation.linear(duration: promptDuration)
+                        .repeatForever(autoreverses: false),
+                    value: scrollText
+                )
             }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 8)
-            .offset(x: scrollText ? -textWidth - 60 : 0)
-            .animation(
-                Animation.linear(duration: max(5, Double(prompt.prompt.count) / 10))
-                    .repeatForever(autoreverses: false),
-                value: scrollText
-            )
-        }
-        .background(GeometryReader { geo in
-            Color.clear.onAppear {
-                scrollViewWidth = geo.size.width
+            .onAppear {
+                scrollViewWidth = containerWidth
+                // Reset animation state and start fresh
+                scrollText = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     scrollText = true
                 }
             }
-        })
-        .mask(
-            // Masque avec dégradé aux bords pour un effet fondu
-            LinearGradient(
-                gradient: Gradient(stops: [
-                    .init(color: .clear, location: 0),
-                    .init(color: .white, location: 0.05),
-                    .init(color: .white, location: 0.95),
-                    .init(color: .clear, location: 1)
-                ]),
-                startPoint: .leading,
-                endPoint: .trailing
+            .mask(
+                // Mask with gradient at edges for fade effect
+                LinearGradient(
+                    gradient: Gradient(stops: [
+                        .init(color: .clear, location: 0),
+                        .init(color: .white, location: 0.05),
+                        .init(color: .white, location: 0.95),
+                        .init(color: .clear, location: 1)
+                    ]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
             )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
     }
     
-    // Indicateurs de progression (points)
+    // Indicate indicators (dots)
     private var progressIndicator: some View {
         HStack(spacing: 8) {
             ForEach(0..<llmManager.currentPrompts.count, id: \.self) { index in
@@ -165,7 +174,7 @@ struct PromptDisplayView: View {
                     .onTapGesture {
                         changePrompt(to: index)
                     }
-                    // Agrandir la zone tactile pour faciliter le tap
+                    // Enlarge touch area for easier tapping
                     .contentShape(Rectangle().size(CGSize(width: 24, height: 24)))
                     .padding(9)
             }
@@ -173,44 +182,59 @@ struct PromptDisplayView: View {
         .padding(.top, 8)
     }
     
-    // Change le prompt et réinitialise l'animation
+    // Changes the prompt and resets animation and timer
     private func changePrompt(to index: Int) {
+        // Stop animation before changing index
+        scrollText = false
+        
         withAnimation {
-            // Arrêter l'ancienne animation avant de changer
+            // Change prompt
+            currentPromptIndex = index
+        }
+        
+        // Reset timer to ensure full duration for new prompt
+        restartAutoAdvanceTimer()
+    }
+    
+    // Handles timer tick
+    private func handleTimerTick() {
+        // Move to next prompt
+        if llmManager.currentPrompts.count > 1 && recognitionViewModel.llmState != .generating {
+            // Stop animation before changing index
             scrollText = false
             
-            // Changer de prompt
-            currentPromptIndex = index
-            
-            // Réinitialiser l'animation après un court délai
-            resetScrollAnimation()
-        }
-    }
-    
-    // Gère le tick du timer
-    private func handleTimerTick() {
-        withAnimation {
-            // Passer au prompt suivant automatiquement seulement si on n'est pas en chargement
-            if llmManager.currentPrompts.count > 1 && recognitionViewModel.llmState != .generating {
-                // Passer au prompt suivant
+            withAnimation {
+                // Pass to next prompt
                 currentPromptIndex = (currentPromptIndex + 1) % llmManager.currentPrompts.count
-                
-                // Réinitialiser l'animation de défilement
-                resetScrollAnimation()
             }
+            
+            // Restart timer for next cycle
+            restartAutoAdvanceTimer()
         }
     }
     
-    // Réinitialise l'animation de défilement
-    private func resetScrollAnimation() {
-        scrollText = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            scrollText = true
+    // Starts auto-advance timer
+    private func startAutoAdvanceTimer() {
+        stopAutoAdvanceTimer() // Ensures existing timer is stopped
+        
+        autoAdvanceTimer = Timer.scheduledTimer(withTimeInterval: promptDuration, repeats: false) { _ in
+            handleTimerTick()
         }
+    }
+    
+    // Restarts auto-advance timer (after manual change)
+    private func restartAutoAdvanceTimer() {
+        startAutoAdvanceTimer()
+    }
+    
+    // Stops auto-advance timer
+    private func stopAutoAdvanceTimer() {
+        autoAdvanceTimer?.invalidate()
+        autoAdvanceTimer = nil
     }
 }
 
-// Vue pour afficher un paramètre
+// View for displaying a parameter
 struct ParameterView: View {
     let icon: String
     let value: String
@@ -245,21 +269,21 @@ struct ParameterView: View {
     }
 }
 
-// Extension pour l'accès sécurisé aux tableaux
+// Extension for safe access to arrays
 extension Array {
     subscript(safe index: Index) -> Element? {
         return indices.contains(index) ? self[index] : nil
     }
 }
 
-// Vue d'animation de chargement futuriste
+// Futuristic loading animation view
 struct LoadingPromptView: View {
     @State private var animationValue: CGFloat = 0
     @State private var pulseOpacity: Double = 0.7
     
     var body: some View {
         ZStack {
-            // Fond du bandeau
+            // Background banner
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.blue.opacity(0.2))
                 .overlay(
@@ -274,7 +298,7 @@ struct LoadingPromptView: View {
                         )
                 )
                 .overlay(
-                    // Effet de pulsation
+                    // Pulsation effect
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(
                             LinearGradient(
@@ -287,9 +311,9 @@ struct LoadingPromptView: View {
                         .blur(radius: 3)
                 )
             
-            // Contenu
+            // Content
             HStack(spacing: 16) {
-                // Icône de chargement simplifiée
+                // Simplified loading icon
                 Circle()
                     .stroke(Color.cyan.opacity(0.8), lineWidth: 1)
                     .frame(width: 24, height: 24)
@@ -301,14 +325,14 @@ struct LoadingPromptView: View {
                     )
                     .frame(width: 30, height: 30)
                 
-                // Texte
+                // Text
                 Text("AI PROMPT GENERATION")
                     .font(.system(.body, design: .rounded))
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .kerning(0.5)
                 
-                // Indicateur simple
+                // Simple indicator
                 Circle()
                     .fill(Color.cyan)
                     .frame(width: 6, height: 6)
@@ -320,12 +344,12 @@ struct LoadingPromptView: View {
         .frame(height: 50)
         .padding(.horizontal, 16)
         .onAppear {
-            // Démarrer l'animation
+            // Start animation
             withAnimation(Animation.linear(duration: 2).repeatForever(autoreverses: false)) {
                 animationValue = 2 * .pi
             }
             
-            // Animation de pulsation
+            // Pulsation animation
             withAnimation(Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                 pulseOpacity = 0.3
             }

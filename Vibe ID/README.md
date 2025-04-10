@@ -1,183 +1,242 @@
-# Vibe ID
+# Vibe ID v2.0
 
-**Vibe ID** is an iOS application that identifies the music you're listening to and sends generated image prompts and identification data via OSC (Open Sound Control) to other software like TouchDesigner, MaxMSP, or Chataigne.
+**Vibe ID** is an iOS application designed to assist AI-based automated VJing systems. It identifies ambient music (via AudD API or incoming OSC) and leverages LLMs (Large Language Models) to generate creative prompts for image generation. Track information and generated prompts are sent via OSC (Open Sound Control) to other software (TouchDesigner, Chataigne, MaxMSP, etc.) for automated VJing or other creative interactions.
 
 ## Screenshots
 
-### Idle Interface
-![Vibe ID Idle Interface](https://raw.githubusercontent.com/studiocarlos/vibeid/main/screenshots/vibe-id-idle-v1.2.png)
-*Ready to identify music with elegant neon-style UI*
+### Main Interface (Idle / Listening)
+![Vibe ID Interface Idle/Listening v2.0](screenshots/vibe-id-idle-v2.0.png)
+*Application ready for music.*
 
-### Results with Generated Prompts
-![Vibe ID Results Interface](https://raw.githubusercontent.com/studiocarlos/vibeid/main/screenshots/vibe-id-results-v1.2.png)
-*Displaying identified track with AI-generated image prompts*
+### Main Interface (Identified Track + Prompts)
+![Vibe ID Results Interface v2.0](screenshots/vibe-id-results-v2.0.png)
+*Display of the identified track and carousel of generated AI prompts.*
 
-### Settings Page
-![Vibe ID Settings](https://raw.githubusercontent.com/studiocarlos/vibeid/main/screenshots/vibe-id-settings-v1.2.png)
-*Configure API keys, OSC settings, and LLM parameters*
+### Settings Panel
+![Vibe ID Settings v2.0](screenshots/vibe-id-settings-v2.0.png)
+*Configuration of API keys (AudD, LLMs), OSC parameters (Send/Receive), LLM selection and system prompt.*
 
-## What's New in Version 1.2
+## New in Version 2.0
 
-### AI-Powered Image Prompt Generation
-- **LLM Integration**: Automatically generates creative visuals prompts for identified tracks using a LLM with AI websearch
-- **Multi-LLM Support**: Architecture supports multiple LLM providers (Claude, OpenAI planned for future updates)
-- **Web Search Enhanced**: Utilizes web search capabilities to gather information about tracks for better prompts
-- **Customizable System Prompts**: Personalize the AI prompt generation system with your own instructions
+This version introduces major features transforming Vibe ID into a true creative assistant for VJs.
 
-### Enhanced OSC Communication
-- **Extended OSC Messages**: Now sends AI-generated image prompts via `/vibeid/track/prompt1` through `/vibeid/track/prompt10`
-- **Improved Testing**: Added simulation feature to test track identification without audio capture
-- **Better Network Diagnostics**: Enhanced troubleshooting for OSC connections
+### AI Visual Prompt Generation with Multi-LLM
+- **Advanced LLM Integration:** Automatically generates 10 creative image prompts for each identified track.
+- **Multi-LLM Support:** Choose your preferred LLM in settings from **Gemini, DeepSeek, ChatGPT (via OpenAI API), and Claude (via Anthropic API)**. *(Note: Only DeepSeek integration is actively tested in this version).*
+- **Dedicated Configuration:** Enter your personal API keys for each LLM service in settings (secure storage).
+- **Customizable System Prompt:** Guide the AI with your own "System Prompt" (modifiable in settings) to direct the style or content of generated prompts. The AI uses track information and potentially its own knowledge/web research to create prompts.
+- **Integrated Display:** The 10 generated prompts are displayed at the bottom of the main screen in a navigable carousel.
+- **OSC Prompt Transmission:** All 10 prompts are sent via OSC (`/vibeid/track/prompt1` to `/vibeid/track/prompt10`).
 
-### Improved User Interface
-- **Prompt Display**: View generated prompts directly in the app interface
-- **Smoother Animations**: Enhanced visual feedback during recognition and processing
-- **Layout Optimizations**: Better space usage on all device sizes
+### Track Information Reception via OSC
+- **Alternative to AudD:** Receive Title/Artist information directly from an external source (e.g., DJ software, Pro DJ Link to OSC adapter...).
+- **Configurable Address:** Define in settings the exact OSC address that Vibe ID should listen to. *Recommended format: Unique address with Artist (string) and Title (string) as arguments.*
+- **LLM Triggering:** Receiving information via OSC triggers prompt generation by the selected LLM.
+- **AudD Timer Reset:** OSC reception resets the timer for the next automatic identification via AudD.
+- **Visual Indicator:** The interface indicates when information comes from an OSC source.
+- **Activation/Deactivation:** A button and a setting allow activating/deactivating OSC listening.
 
-## Features
+### User Interface and Improvements
+- **Refined UI:** Improved general design, optimized Dark Mode.
+- **Functional Prompt Carousel**.
+- **Stability:** Improved state management.
+- **Countdown:** Indicates time until next AudD ID.
 
-- Audio identification every X minutes via the [AudD](https://audd.io/) API
-- Automatic AI image prompt generation for identified music via LLM (DeepSeek)
-- Sending musical identification data and AI prompts via OSC
-- Simple and intuitive user interface with DJ/VJ-oriented design
-- Customizable recognition interval configuration
-- Real-time track information display (BPM, energy, danceability)
-- Manual prompt functionality for free expression
-- Network diagnostics for OSC connection
-- Dark theme with glowing neon accents
+## Key Features (v2.0)
+
+- Periodic audio identification via [AudD](https://audd.io/).
+- **Title/Artist reception via OSC**.
+- Generation of **10 AI prompts** via **LLM of choice (DeepSeek tested**; Gemini, ChatGPT, Claude implemented but not tested).
+- **Customizable LLM System Prompt**.
+- Sending of music data AND 10 AI prompts via OSC.
+- Track info display (Cover art, Title, Artist, Source, Genre?, BPM?).
+- Carousel display of 10 AI prompts.
+- **Data source indicator** (AudD/OSC).
+- Simple interface, optimized Dark Mode.
+- Configuration: API Keys (AudD, LLMs), OSC Send (IP/Port), OSC Receive (Port, Address), AudD ID Frequency, LLM Choice, LLM System Prompt.
+- Manual prompt via OSC.
 
 ## Requirements
 
-- iOS 14.0+
-- Xcode 13.0+
-- An [AudD](https://dashboard.audd.io/) API key
-- (Optional) A LLM API key for AI prompt generation
-- A device or software that can receive OSC messages
+- **iOS 17.0+**
+- Xcode 15.0+
+- [AudD](https://dashboard.audd.io/) API key.
+- At least one LLM API key (DeepSeek recommended initially) for prompt generation.
+- OSC receiver on local network.
+- (Optional) OSC transmitter for track info.
 
 ## Installation
 
-1. Clone this repository
-2. Open `Vibe ID.xcodeproj` in Xcode
-3. Compile and run on your iOS device
+1. Clone the GitHub repository.
+2. Open `Vibe ID.xcodeproj` in Xcode.
+3. Resolve SPM dependencies if necessary (File > Packages > Resolve...).
+4. Compile and launch on iOS device.
+5. **Permissions:** Allow **Microphone** and **Local Network** access.
 
-## Configuration
+## Essential Configuration
 
-1. Open the application and go to Settings
-2. Enter your AudD API key
-3. Enter your DeepSeek API key for AI prompt generation
-4. Configure the OSC host and destination port
-5. Adjust the recognition frequency according to your needs
-6. (Optional) Customize the LLM system prompt for personalized results
+1. Open Vibe ID > Settings (⚙️).
+2. Enter the **AudD API key**.
+3. Enter at least the **DeepSeek API key** (or other, knowing that others are untested) and select the LLM.
+4. (Recommended) Customize the **LLM System Prompt**.
+5. Configure **OSC Target IP** and **OSC Target Port**.
+6. Adjust **Identification Frequency**.
+7. If OSC reception: Enable, configure **Listening Port** and **Incoming OSC Address**.
 
 ## OSC Message Format
 
-The application sends the following information via OSC:
+### Messages Sent by Vibe ID:
 
-- `/vibeid/track/title` (string): Track title
-- `/vibeid/track/artist` (string): Artist name
-- `/vibeid/track/genre` (string): Musical genre
-- `/vibeid/track/bpm` (float): BPM of the track (if available)
-- `/vibeid/track/energy` (float): Energy of the track (if available)
-- `/vibeid/track/danceability` (float): Danceability of the track (if available)
-- `/vibeid/track/artwork` (string): Artwork URL
-- `/vibeid/track/prompt1` through `/vibeid/track/prompt10` (string): AI-generated image prompts
-- `/vibeid/status` (string): Application status ("listening", "recognizing", "identified", "no_match", "error", "stopped")
-- `/vibeid/manual` (string): Manual prompts entered by the user
-- `/vibeid/test` (string): Test messages ("ping")
+* `/vibeid/app/status` (string): "listening_started", "listening_stopped".
+* `/vibeid/track/new` (bang/trigger): New track signal.
+* `/vibeid/track/title` (string): Title.
+* `/vibeid/track/artist` (string): Artist.
+* `/vibeid/track/album` (string): Album (if available).
+* `/vibeid/track/genre` (string): Genre(s) (if available).
+* `/vibeid/track/bpm` (float): BPM (if available).
+* `/vibeid/track/artworkURL` (string): Cover art URL (if available).
+* `/vibeid/track/source` (string): "AudD" or "OSC".
+* `/vibeid/track/prompt1` ... `/vibeid/track/prompt10` (string): AI Prompts.
+* `/vibeid/status` (string): Internal status (e.g., "identifying", "generating_prompts", "error"). *(To be refined)*
+* `/vibeid/prompt/manual` (string): Manual prompt.
+
+### Message Received by Vibe ID (Recommended Example):
+
+* **Address:** (Configurable, e.g.: `/external/track`)
+* **Arguments:** `s` (Artist), `s` (Title)
 
 ## License
 
-This project is licensed under the [GNU GPLv3](LICENSE).
+This project is licensed under the **GNU GPL v3**. See the [LICENSE](LICENSE) file.
 
 ## Credits
 
-- Audio identification via [AudD](https://audd.io/)
-- AI prompt generation via [DeepSeek](https://deepseek.com/)
-- OSC implemented with [OSCKit](https://github.com/orchetect/OSCKit)
-- Developed by [Studio Carlos](https://studiocarlos.fr)
+* Audio identification: [AudD](https://audd.io/)
+* AI Prompt Generation: [DeepSeek](https://deepseek.com/) APIs (Tested), [Google Gemini](https://ai.google.dev/), [OpenAI](https://openai.com/), [Anthropic Claude](https://www.anthropic.com/) (Implemented, Not tested).
+* OSC: [OSCKit](https://github.com/orchetect/OSCKit).
+* Keychain: [KeychainAccess](https://github.com/kishikawakatsumi/KeychainAccess).
+* Developed by **Studio Carlos (Copyright 2025)**
+
+---
+<br/>
 
 ---
 
-# Vibe ID
+# Vibe ID v2.0 (Français)
 
-**Vibe ID** est une application iOS qui identifie la musique que vous écoutez et envoie les données d'identification via OSC (Open Sound Control) à d'autres logiciels comme TouchDesigner, MaxMSP ou Chataigne.
+**Vibe ID** est une application iOS conçue pour assister les systèmes de VJing automatiques basés sur l'IA. Elle identifie la musique ambiante (via l'API AudD ou OSC entrant) et exploite des LLMs (Modèles de Langage Larges) pour générer des prompts créatifs destinés à la génération d'images. Les informations du morceau et les prompts générés sont envoyés via OSC (Open Sound Control) à d'autres logiciels (TouchDesigner, Chataigne, MaxMSP, etc.) pour le VJing automatique ou d'autres interactions créatives.
 
-## Nouveautés de la version 1.2
+## Captures d'Écran
 
-### Génération de prompts d'image par IA
-- **Intégration de LLM** : Génère automatiquement des prompts créatifs pour les morceaux identifiés en utilisant DeepSeek AI
-- **Support multi-LLM** : Architecture supportant plusieurs fournisseurs de LLM (Claude, OpenAI prévus pour les mises à jour futures)
-- **Recherche web améliorée** : Utilise les capacités de recherche web pour rassembler des informations sur les morceaux et créer de meilleurs prompts
-- **Prompts système personnalisables** : Personnalisez le système de génération de prompts avec vos propres instructions
+### Interface Principale (Repos / Écoute)
+![Vibe ID Interface Repos/Écoute v2.0](screenshots/vibe-id-idle-v2.0.png)
+*Application prête ou en écoute active de la musique.*
 
-### Communication OSC améliorée
-- **Messages OSC étendus** : Envoie maintenant des prompts d'image générés par IA via `/vibeid/track/prompt1` à `/vibeid/track/prompt10`
-- **Tests améliorés** : Ajout d'une fonction de simulation pour tester l'identification des morceaux sans capture audio
-- **Meilleurs diagnostics réseau** : Dépannage amélioré pour les connexions OSC
+### Interface Principale (Morceau Identifié + Prompts)
+![Vibe ID Interface Résultats v2.0](screenshots/vibe-id-results-v2.0.png)
+*Affichage du morceau identifié et du carrousel de prompts IA générés.*
 
-### Interface utilisateur améliorée
-- **Affichage des prompts** : Visualisez les prompts générés directement dans l'interface de l'application
-- **Animations plus fluides** : Retour visuel amélioré pendant la reconnaissance et le traitement
-- **Optimisations de mise en page** : Meilleure utilisation de l'espace sur tous les formats d'écran
+### Panneau des Réglages
+![Vibe ID Réglages v2.0](screenshots/vibe-id-settings-v2.0.png)
+*Configuration des clés API (AudD, LLMs), des paramètres OSC (Envoi/Réception), du choix du LLM et du prompt système.*
 
-## Fonctionnalités
+## Nouveautés de la Version 2.0
 
-- Identification audio toutes les X minutes via l'API [AudD](https://audd.io/)
-- Génération automatique de prompts d'image par IA pour la musique identifiée via LLM (DeepSeek)
-- Envoi des données d'identification musicales et des prompts IA via OSC
-- Interface utilisateur simple et intuitive avec design orienté DJ/VJ
-- Configuration d'intervalle de reconnaissance personnalisable
-- Affichage en temps réel des informations de piste (BPM, énergie, dansabilité)
-- Fonctionnalité de prompt manuel pour l'expression libre
-- Diagnostic réseau pour la connexion OSC
-- Thème sombre avec accents néon lumineux
+Cette version introduit des fonctionnalités majeures transformant Vibe ID en un véritable assistant créatif pour VJ.
+
+### Génération de Prompts Visuels par IA Multi-LLM
+- **Intégration Avancée de LLM :** Génère automatiquement 10 prompts d'images créatifs pour chaque morceau identifié.
+- **Support Multi-LLM :** Choisissez votre LLM préféré dans les réglages parmi **Gemini, DeepSeek, ChatGPT (via API OpenAI), et Claude (via API Anthropic)**. *(Note : Seule l'intégration de DeepSeek est activement testée dans cette version).*
+- **Configuration Dédiée :** Entrez vos clés API personnelles pour chaque service LLM dans les réglages (stockage sécurisé).
+- **Prompt Système Personnalisable :** Guidez l'IA avec votre propre "System Prompt" (modifiable dans les réglages) pour orienter le style ou le contenu des prompts générés. L'IA utilise les informations du morceau et potentiellement ses propres connaissances/recherche web pour créer les prompts.
+- **Affichage Intégré :** Les 10 prompts générés s'affichent en bas de l'écran principal dans un carrousel navigable.
+- **Envoi OSC des Prompts :** Les 10 prompts sont envoyés via OSC (`/vibeid/track/prompt1` à `/vibeid/track/prompt10`).
+
+### Réception d'Informations de Piste via OSC
+- **Alternative à AudD :** Recevez directement les informations Titre/Artiste depuis une source externe (ex: logiciel DJ, adaptateur Pro DJ Link vers OSC...).
+- **Adresse Configurable :** Définissez dans les réglages l'adresse OSC exacte que Vibe ID doit écouter. *Format recommandé : Adresse unique avec Artiste (string) et Titre (string) comme arguments.*
+- **Déclenchement LLM :** La réception d'informations via OSC déclenche la génération de prompts par le LLM sélectionné.
+- **Réinitialisation Timer AudD :** La réception OSC réinitialise le compteur pour la prochaine identification automatique via AudD.
+- **Indicateur Visuel :** L'interface indique quand les informations proviennent d'une source OSC.
+- **Activation/Désactivation :** Un bouton et un réglage permettent d'activer/désactiver l'écoute OSC.
+
+### Interface Utilisateur et Améliorations
+- **UI Raffinée :** Design général amélioré, optimisé Dark Mode.
+- **Carrousel de Prompts Fonctionnel**.
+- **Stabilité :** Améliorations de la gestion d'état.
+- **Compte à Rebours :** Indique le temps avant la prochaine ID AudD.
+
+## Fonctionnalités Clés (v2.0)
+
+- Identification audio périodique via [AudD](https://audd.io/).
+- **Réception Titre/Artiste via OSC**.
+- Génération de **10 prompts IA** via **LLM au choix (DeepSeek testé**; Gemini, ChatGPT, Claude implémentés mais non testés).
+- **Prompt Système LLM personnalisable**.
+- Envoi des données musicales ET des 10 prompts IA via OSC.
+- Affichage infos piste (Pochette, Titre, Artiste, Source, Genre?, BPM?).
+- Affichage en carrousel des 10 prompts IA.
+- **Indicateur de source de données** (AudD/OSC).
+- Interface simple, optimisée Dark Mode.
+- Configuration : Clés API (AudD, LLMs), Envoi OSC (IP/Port), Réception OSC (Port, Adresse), Fréquence ID AudD, Choix LLM, Prompt Système LLM.
+- Prompt manuel via OSC.
 
 ## Prérequis
 
-- iOS 14.0+
-- Xcode 13.0+
-- Une clé API [AudD](https://dashboard.audd.io/)
-- (Optionnel) Une clé API DeepSeek pour la génération de prompts IA
-- Un appareil ou logiciel qui peut recevoir des messages OSC
+- **iOS 17.0+**
+- Xcode 15.0+
+- Clé API [AudD](https://dashboard.audd.io/).
+- Au moins une clé API LLM (DeepSeek recommandé initialement) pour la génération de prompts.
+- Récepteur OSC sur le réseau local.
+- (Optionnel) Emetteur OSC pour info piste.
 
 ## Installation
 
-1. Cloner ce repository
-2. Ouvrir `Vibe ID.xcodeproj` dans Xcode
-3. Compiler et exécuter sur votre appareil iOS
+1.  Cloner le dépôt GitHub.
+2.  Ouvrir `Vibe ID.xcodeproj` dans Xcode.
+3.  Résoudre les dépendances SPM si nécessaire (File > Packages > Resolve...).
+4.  Compiler et lancer sur appareil iOS.
+5.  **Permissions :** Autoriser l'accès **Microphone** et **Réseau Local**.
 
-## Configuration
+## Configuration Essentielle
 
-1. Ouvrez l'application et allez dans Réglages
-2. Entrez votre clé API AudD
-3. (Optionnel) Entrez votre clé API DeepSeek pour la génération de prompts IA
-4. Configurez l'hôte OSC et le port de destination
-5. Ajustez la fréquence de reconnaissance selon vos besoins
-6. (Optionnel) Personnalisez le prompt système LLM pour des résultats personnalisés
+1.  Ouvrir Vibe ID > Réglages (⚙️).
+2.  Entrer la **clé API AudD**.
+3.  Entrer au moins la **clé API DeepSeek** (ou autre, en sachant que les autres sont non testés) et sélectionner le LLM.
+4.  (Recommandé) Personnaliser le **Prompt Système LLM**.
+5.  Configurer **IP Cible OSC** et **Port Cible OSC**.
+6.  Ajuster **Fréquence d'identification**.
+7.  Si réception OSC : Activer, configurer **Port d'écoute** et **Adresse OSC entrante**.
 
-## Format des messages OSC
+## Format des Messages OSC
 
-L'application envoie les informations suivantes via OSC :
+### Messages Envoyés par Vibe ID :
 
-- `/vibeid/track/title` (string) : Titre du morceau
-- `/vibeid/track/artist` (string) : Nom de l'artiste
-- `/vibeid/track/genre` (string) : Genre musical
-- `/vibeid/track/bpm` (float) : BPM du morceau (si disponible)
-- `/vibeid/track/energy` (float) : Énergie du morceau (si disponible)
-- `/vibeid/track/danceability` (float) : Dansabilité du morceau (si disponible)
-- `/vibeid/track/artwork` (string) : URL de la pochette
-- `/vibeid/track/prompt1` à `/vibeid/track/prompt10` (string) : Prompts d'image générés par IA
-- `/vibeid/status` (string) : État de l'application ("listening", "recognizing", "identified", "no_match", "error", "stopped")
-- `/vibeid/manual` (string) : Prompts manuels entrés par l'utilisateur
-- `/vibeid/test` (string) : Messages de test ("ping")
+* `/vibeid/app/status` (string): "listening_started", "listening_stopped".
+* `/vibeid/track/new` (bang/trigger): Signal nouveau morceau.
+* `/vibeid/track/title` (string): Titre.
+* `/vibeid/track/artist` (string): Artiste.
+* `/vibeid/track/album` (string): Album (si dispo).
+* `/vibeid/track/genre` (string): Genre(s) (si dispo).
+* `/vibeid/track/bpm` (float): BPM (si dispo).
+* `/vibeid/track/artworkURL` (string): URL Pochette (si dispo).
+* `/vibeid/track/source` (string): "AudD" ou "OSC".
+* `/vibeid/track/prompt1` ... `/vibeid/track/prompt10` (string): Prompts IA.
+* `/vibeid/status` (string): Statut interne (ex: "identifying", "generating_prompts", "error"). *(À affiner)*
+* `/vibeid/prompt/manual` (string): Prompt manuel.
+
+### Message Reçu par Vibe ID (Exemple Recommandé) :
+
+* **Adresse :** (Configurable, ex: `/external/track`)
+* **Arguments :** `s` (Artiste), `s` (Titre)
 
 ## Licence
 
-Ce projet est sous licence [GNU GPLv3](LICENSE).
+Ce projet est sous licence **GNU GPL v3**. Voir le fichier [LICENSE](LICENSE).
 
-## Credits
+## Crédits
 
-- Identification audio via [AudD](https://audd.io/)
-- Génération de prompts IA via [DeepSeek](https://deepseek.com/)
-- OSC implémenté avec [OSCKit](https://github.com/orchetect/OSCKit)
-- Développé par [Studio Carlos](https://studiocarlos.fr)
+* Identification audio : [AudD](https://audd.io/)
+* Génération Prompts IA : APIs [DeepSeek](https://deepseek.com/) (Testé), [Google Gemini](https://ai.google.dev/), [OpenAI](https://openai.com/), [Anthropic Claude](https://www.anthropic.com/) (Implémentés, Non testés).
+* OSC : [OSCKit](https://github.com/orchetect/OSCKit).
+* Keychain : [KeychainAccess](https://github.com/kishikawakatsumi/KeychainAccess).
+* Développé par **Studio Carlos (Copyright 2025)**

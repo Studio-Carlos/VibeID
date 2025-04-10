@@ -247,10 +247,71 @@ struct SubtlePulseAnimation: ViewModifier {
     }
 }
 
+// Animated placeholder for missing artwork
+struct AlbumArtworkPlaceholder: View {
+    @State private var rotation = 0.0
+    @State private var scale: CGFloat = 1.0
+    @State private var hueRotation = 0.0
+    
+    var body: some View {
+        ZStack {
+            // Background with animation
+            Circle()
+                .fill(
+                    AngularGradient(
+                        gradient: Gradient(colors: [.blue, .purple, .cyan, .blue]),
+                        center: .center
+                    )
+                )
+                .blur(radius: 20)
+                .scaleEffect(scale)
+                .hueRotation(Angle(degrees: hueRotation))
+            
+            // Visual elements
+            ForEach(0..<3) { i in
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.white.opacity(0.7), lineWidth: 3)
+                    .frame(width: 100, height: 100)
+                    .rotationEffect(Angle(degrees: Double(i) * 30 + rotation))
+                    .scaleEffect(1.0 - Double(i) * 0.15)
+                    .blur(radius: 1)
+            }
+            
+            // Pulsation animation
+            Image(systemName: "waveform")
+                .font(.system(size: 40))
+                .foregroundColor(.white.opacity(0.9))
+                .rotationEffect(Angle(degrees: rotation * -0.5))
+                .shadow(color: .white.opacity(0.5), radius: 5)
+        }
+        .frame(width: 200, height: 200)
+        .clipped()
+        .onAppear {
+            // Animation of rotation
+            withAnimation(Animation.linear(duration: 20).repeatForever(autoreverses: false)) {
+                rotation = 360
+            }
+            
+            // Animation of pulsation
+            withAnimation(Animation.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                scale = 1.15
+            }
+            
+            // Animation of colors
+            withAnimation(Animation.linear(duration: 15).repeatForever(autoreverses: false)) {
+                hueRotation = 360
+            }
+        }
+    }
+}
+
 struct ContentView: View {
     @StateObject private var viewModel = RecognitionViewModel()
     @State private var manualPromptText: String = ""
     @State private var showingSettings: Bool = false
+    
+    // Access to settings manager
+    @StateObject private var settings = SettingsManager.shared
     
     // Animation states
     @State private var showIdentificationAnimation = false
@@ -267,6 +328,26 @@ struct ContentView: View {
     // Keyboard state tracking
     @State private var keyboardShown = false
     @FocusState private var isInputFocused: Bool
+    
+    // Toggle OSC reception
+    private func toggleOscReceiver() {
+        settings.isOscInputEnabled.toggle()
+        
+        // Visual feedback for temporary status
+        let status = settings.isOscInputEnabled ? "OSC input enabled" : "OSC input disabled"
+        viewModel.statusMessage = status
+        
+        // Reset message after a delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            if viewModel.statusMessage == status {
+                if viewModel.isListening {
+                    viewModel.statusMessage = "Listening..."
+                } else {
+                    viewModel.statusMessage = "Ready"
+                }
+            }
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -331,7 +412,7 @@ struct ContentView: View {
                         // Left-aligned test button
                         HStack {
                             Button {
-                                simulateTrackDetection()
+                                toggleOscReceiver()
                             } label: {
                                 ZStack {
                                     Circle()
@@ -341,24 +422,32 @@ struct ContentView: View {
                                             Circle()
                                                 .stroke(
                                                     LinearGradient(
-                                                        colors: [.green.opacity(0.6), .blue.opacity(0.6)],
+                                                        colors: [
+                                                            settings.isOscInputEnabled ? .cyan.opacity(0.8) : .gray.opacity(0.4),
+                                                            settings.isOscInputEnabled ? .blue.opacity(0.8) : .gray.opacity(0.4)
+                                                        ],
                                                         startPoint: .topLeading,
                                                         endPoint: .bottomTrailing
                                                     ),
                                                     lineWidth: 1.5
                                                 )
                                         )
-                                        .shadow(color: .green.opacity(0.5), radius: 4, x: 0, y: 0)
+                                        .shadow(color: settings.isOscInputEnabled ? .cyan.opacity(0.5) : .gray.opacity(0.2), radius: 4, x: 0, y: 0)
                                     
-                                    Image(systemName: "music.note")
+                                    Image(systemName: settings.isOscInputEnabled ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
                                         .font(.system(size: 18))
                                         .foregroundStyle(
                                             LinearGradient(
-                                                colors: [.gray, .white.opacity(0.7)],
+                                                colors: [
+                                                    settings.isOscInputEnabled ? .cyan : .gray.opacity(0.7),
+                                                    settings.isOscInputEnabled ? .blue.opacity(0.9) : .gray.opacity(0.5)
+                                                ],
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             )
                                         )
+                                        .opacity(settings.isOscInputEnabled ? 1.0 : 0.7)
+                                        .symbolEffect(.pulse, options: .repeating, value: settings.isOscInputEnabled)
                                 }
                             }
                             .padding(.top, 10)
@@ -537,122 +626,124 @@ struct ContentView: View {
                             
                             // Track information and album section - constrained height
                             VStack(spacing: 5) {
-                                // Album artwork with effect
-                                ZStack {
-                                    // Identification animation
-                                    TrackIdentifiedAnimation(isShowing: trackIdentified)
-                                    
-                                    // Recognition ring animation
-                                    RecognitionRing(isActive: viewModel.isPerformingIdentification)
-                                        .frame(width: 210, height: 210)
-                                    
-                                    // Album Cover with effects - slightly reduced size
-                                    AsyncImage(url: viewModel.latestTrack?.artworkURL) { phase in
-                                        if let image = phase.image { 
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .onAppear {
-                                                    // Trigger identification animation when image loads
-                                                    withAnimation {
-                                                        trackIdentified = true
-                                                        
-                                                        // Reset animation after delay
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                            trackIdentified = false
+                                // Track info container
+                                if let track = viewModel.latestTrack {
+                                    VStack(spacing: 12) {
+                                        // Album artwork with effect
+                                        ZStack {
+                                            // Identification animation
+                                            TrackIdentifiedAnimation(isShowing: trackIdentified)
+                                            
+                                            // Recognition ring animation
+                                            RecognitionRing(isActive: viewModel.isPerformingIdentification)
+                                                .frame(width: 210, height: 210)
+                                            
+                                            // Album Cover with effects - slightly reduced size
+                                            AsyncImage(url: viewModel.latestTrack?.artworkURL) { phase in
+                                                if let image = phase.image { 
+                                                    image
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fit)
+                                                        .onAppear {
+                                                            // Trigger identification animation when image loads
+                                                            withAnimation {
+                                                                trackIdentified = true
+                                                                
+                                                                // Reset animation after delay
+                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                                    trackIdentified = false
+                                                                }
+                                                            }
                                                         }
-                                                    }
                                                 }
-                                        }
-                                        else if phase.error != nil { 
-                                            Image(systemName: "photo")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .padding(40)
-                                                .foregroundColor(.gray.opacity(0.5))
-                                        }
-                                        else { 
-                                            Image(systemName: "waveform.circle")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .padding(40)
-                                                .foregroundColor(.gray.opacity(0.5))
-                                                .rotationEffect(.degrees(viewModel.isPerformingIdentification ? rotationDegrees : 0))
-                                        }
-                                    }
-                                    .frame(width: min(180, geometry.size.width * 0.5), height: min(180, geometry.size.width * 0.5))
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.black.opacity(0.5))
+                                                else {
+                                                    // Animated placeholder for loading and error states
+                                                    AlbumArtworkPlaceholder()
+                                                }
+                                            }
+                                            .frame(width: 200, height: 200)
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(
+                                                RoundedRectangle(cornerRadius: 15)
+                                                    .strokeBorder(
                                                         LinearGradient(
-                                                            colors: [.blue.opacity(0.6), .purple.opacity(0.6)],
+                                                            colors: [.blue.opacity(0.4), .purple.opacity(0.4)],
                                                             startPoint: .topLeading,
                                                             endPoint: .bottomTrailing
                                                         ),
-                                                        lineWidth: 1.5
+                                                        lineWidth: 1
                                                     )
                                             )
-                                    )
-                                    .neonEffect(color: .blue)
-                                }
-                                
-                                // Title and artist
-                                VStack(spacing: 4) {
-                                    Text(viewModel.latestTrack?.title ?? "Waiting for the beat...")
-                                        .font(.system(.title3, design: .rounded)) // Reduced size
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(
-                                            LinearGradient(
-                                                colors: [.white, .blue.opacity(0.8)],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .multilineTextAlignment(.center)
-                                        .lineLimit(1)
-                                        .shadow(color: .blue.opacity(0.5), radius: 5, x: 0, y: 0)
-                                    
-                                    Text(viewModel.latestTrack?.artist ?? "-")
-                                        .font(.system(.body, design: .rounded)) // Reduced size
-                                        .foregroundStyle(
-                                            LinearGradient(
-                                                colors: [.gray, .white.opacity(0.7)],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .multilineTextAlignment(.center)
-                                        .lineLimit(1)
-                                }
-                                
-                                // Track metadata
-                                VStack(spacing: 5) {
-                                    // Genre
-                                    if let genre = viewModel.latestTrack?.genre, !genre.isEmpty {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "music.note.list")
-                                                .font(.system(size: 11, weight: .semibold))
-                                                .foregroundColor(.cyan)
-                                            Text(genre)
-                                                .font(.system(.caption2, design: .rounded))
-                                                .fontWeight(.medium)
-                                                .foregroundColor(.white.opacity(0.9))
+                                            .shadow(color: .blue.opacity(0.2), radius: 15, x: 0, y: 10)
                                         }
-                                        .techBadge()
+                                        
+                                        // Song info with parameters
+                                        VStack(spacing: 5) {
+                                            VStack(spacing: 4) {
+                                                Text(track.title ?? "Unknown")
+                                                    .font(.system(.title2, design: .rounded))
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(.white)
+                                                    .multilineTextAlignment(.center)
+                                                    .frame(maxWidth: .infinity, alignment: .center)
+                                                
+                                                HStack(spacing: 6) {
+                                                    Text(track.artist ?? "Unknown Artist")
+                                                        .font(.system(.title3, design: .rounded))
+                                                        .fontWeight(.medium)
+                                                        .foregroundColor(.gray)
+                                                        .multilineTextAlignment(.center)
+                                                    
+                                                    // OSC source indicator
+                                                    if track.source == .osc {
+                                                        HStack(spacing: 2) {
+                                                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                                                .font(.caption)
+                                                            Text("OSC")
+                                                                .font(.caption)
+                                                                .fontWeight(.bold)
+                                                        }
+                                                        .padding(.horizontal, 6)
+                                                        .padding(.vertical, 2)
+                                                        .background(Color.blue.opacity(0.3))
+                                                        .cornerRadius(4)
+                                                        .foregroundColor(.cyan)
+                                                    }
+                                                }
+                                                .frame(maxWidth: .infinity, alignment: .center)
+                                            }
+                                            
+                                            // Track metadata
+                                            VStack(spacing: 5) {
+                                                // Genre
+                                                if let genre = track.genre, !genre.isEmpty {
+                                                    HStack(spacing: 4) {
+                                                        Image(systemName: "music.note.list")
+                                                            .font(.system(size: 11, weight: .semibold))
+                                                            .foregroundColor(.cyan)
+                                                        Text(genre)
+                                                            .font(.system(.caption2, design: .rounded))
+                                                            .fontWeight(.medium)
+                                                            .foregroundColor(.white.opacity(0.9))
+                                                    }
+                                                    .techBadge()
+                                                }
+                                                
+                                                // The BPM, Energy and Danceability indicators were removed
+                                                // as the API doesn't provide this information reliably
+                                                if viewModel.currentTrackInfo?.bpm != nil {
+                                                    // BPM display disabled but condition preserved for future use
+                                                }
+                                            }
+                                        }
                                     }
-                                    
-                                    // Les indicateurs BPM, Energy et Danceability ont été supprimés car
-                                    // l'API ne fournit pas ces informations de manière fiable
                                 }
                             }
                             .padding(.horizontal, 20)
                             
-                            // Affichage des prompts
+                            // Display prompts
                             if case .idle = viewModel.llmState {
-                                // Ne rien afficher si état idle
+                                // Don't display anything if in idle state
                             } else {
                                 VStack(spacing: 8) {
                                     switch viewModel.llmState {
@@ -660,7 +751,7 @@ struct ContentView: View {
                                         HStack {
                                             ProgressView()
                                                 .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                                            Text("Génération des prompts...")
+                                            Text("Generating prompts...")
                                                 .foregroundColor(.blue)
                                         }
                                         .padding()
@@ -782,42 +873,6 @@ struct ContentView: View {
             return "Ethernet"
         case .unknown:
             return "Connected"
-        }
-    }
-    
-    // Function to simulate detection of a specific track
-    private func simulateTrackDetection() {
-        let testTrack = TrackInfo(
-            title: "Pass This On",
-            artist: "The Knife",
-            artworkURL: URL(string: "https://i.scdn.co/image/ab67616d0000b27320feadae116e4b306d58d69c"),
-            genre: "Electronic",
-            bpm: nil,
-            energy: nil,
-            danceability: nil
-        )
-        
-        // Mise à jour de l'interface
-        viewModel.latestTrack = testTrack
-        
-        // Animation de détection réussie
-        withAnimation {
-            trackIdentified = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                trackIdentified = false
-            }
-        }
-        
-        // Envoi OSC si configuré
-        Task {
-            await viewModel.sendTestTrackInfo(track: testTrack)
-            
-            // Déclencher la génération des prompts LLM si configuré
-            if SettingsManager.shared.hasValidLLMConfig {
-                viewModel.llmState = .generating
-                await viewModel.llmManager.generatePrompts(for: testTrack)
-                viewModel.handleLLMState()
-            }
         }
     }
 } // End struct ContentView

@@ -1,0 +1,138 @@
+{
+  "" : {
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe ID-master.dia",
+    "emit-module-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe ID-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe ID-master-emit-module.dia",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe ID-master.swiftdeps"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/AudDAPIManager.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDAPIManager~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/AudDResponseModels.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudDResponseModels~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/AudioCaptureManager.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/AudioCaptureManager~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/ContentView.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/ContentView~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/LLMManager.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/LLMManager~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/OSCManager.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/OSCManager~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/PromptDisplayView.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/PromptDisplayView~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/RecognitionViewModel.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/RecognitionViewModel~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/SettingsManager.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsManager~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/SettingsView.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/TrackInfo.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/TrackInfo~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/Vibe ID/Vibe_IDApp.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/Vibe_IDApp~partial.swiftmodule"
+  },
+  "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Documents/Cursor/vibeid/Vibe ID/build/Vibe ID.build/Debug-iphonesimulator/Vibe ID.build/Objects-normal/x86_64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

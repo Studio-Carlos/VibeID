@@ -22,8 +22,9 @@ import Combine
 
 enum LLMType: String, CaseIterable {
     case deepseek = "DeepSeek"
+    case gemini = "Gemini"
     case claude = "Claude"
-    case chatGPT = "Chat GPT"
+    case chatGPT = "ChatGPT"
 }
 
 struct LLMPrompt: Identifiable, Equatable {
@@ -38,7 +39,7 @@ struct LLMPrompt: Identifiable, Equatable {
         self.parameters = parameters
     }
     
-    // Constructeur pour accepter des entiers dans les paramètres
+    // Constructor to accept integers in parameters
     init(prompt: String, parameters: [String: Int]) {
         self.prompt = prompt
         self.timestamp = Date().timeIntervalSince1970
@@ -90,6 +91,7 @@ class LLMManager: ObservableObject {
         let settings = await SettingsManager.shared
         let apiKey = await settings.getCurrentLLMAPIKey()
         let systemPrompt = await settings.llmSystemPrompt
+        let selectedLLM = await settings.selectedLLM
         
         // First part of the prompt (template with placeholders)
         let partOne = """
@@ -143,10 +145,25 @@ class LLMManager: ObservableObject {
         }
         """
         
-        // Concaténation des trois parties avec un retour à la ligne entre chaque
+        // Concatenate the three parts with a line break between each part
         let fullPrompt = "\(partOne)\n\n\(partTwo)\n\n\(partThree)"
         
-        // Call to the LLM API
+        // Call the appropriate API based on the selected LLM
+        switch selectedLLM {
+        case .deepseek:
+            return try await callDeepSeekAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
+        case .gemini:
+            return try await callGeminiAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
+        case .claude:
+            return try await callClaudeAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
+        case .chatGPT:
+            return try await callChatGPTAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
+        }
+    }
+    
+    // Method to call DeepSeek API
+    private func callDeepSeekAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
+        // Call to the DeepSeek API
         let url = URL(string: "https://api.deepseek.com/v1/chat/completions")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -168,7 +185,7 @@ class LLMManager: ObservableObject {
         
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
-            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "API Error"])
+            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "DeepSeek API Error"])
         }
         
         // Decode the response
@@ -177,14 +194,157 @@ class LLMManager: ObservableObject {
         let content = choices?.first?["message"] as? [String: String]
         let promptText = content?["content"] ?? ""
         
-        // Parse the JSON content in the response
+        return try parsePromptsFromResponse(promptText: promptText, track: track)
+    }
+    
+    // Method to call Google Gemini API
+    private func callGeminiAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
+        // Call to the Gemini API
+        let baseURL = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+        let urlWithKey = "\(baseURL)?key=\(apiKey)"
+        let url = URL(string: urlWithKey)!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Prepare the request body for Gemini
+        let requestBody: [String: Any] = [
+            "contents": [
+                [
+                    "role": "user",
+                    "parts": [
+                        [
+                            "text": fullPrompt
+                        ]
+                    ]
+                ]
+            ],
+            "generationConfig": [
+                "temperature": 0.85,
+                "maxOutputTokens": 1500,
+                "topP": 0.95
+            ],
+            "systemInstruction": [
+                "parts": [
+                    [
+                        "text": "You are an expert AI assistant that helps create detailed prompt descriptions for AI image generation based on music tracks. You have the ability to browse the web to gather information."
+                    ]
+                ]
+            ]
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Gemini API Error"])
+        }
+        
+        // Decode the response
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let candidates = json?["candidates"] as? [[String: Any]]
+        let content = candidates?.first?["content"] as? [String: Any]
+        let parts = content?["parts"] as? [[String: Any]]
+        let textPart = parts?.first?["text"] as? String ?? ""
+        
+        return try parsePromptsFromResponse(promptText: textPart, track: track)
+    }
+    
+    // Method to call Claude API
+    private func callClaudeAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
+        // Call to the Claude API
+        let url = URL(string: "https://api.anthropic.com/v1/messages")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "x-api-key")
+        request.setValue("anthropic-ai/v1", forHTTPHeaderField: "anthropic-version")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let requestBody: [String: Any] = [
+            "model": "claude-3-opus-20240229",
+            "max_tokens": 1500,
+            "temperature": 0.85,
+            "system": "You are an expert AI assistant that helps create detailed prompt descriptions for AI image generation based on music tracks.",
+            "messages": [
+                ["role": "user", "content": fullPrompt]
+            ]
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Claude API Error"])
+        }
+        
+        // Decode the response
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let content = json?["content"] as? [[String: Any]]
+        let textBlock = content?.first(where: { ($0["type"] as? String) == "text" })
+        let promptText = textBlock?["text"] as? String ?? ""
+        
+        return try parsePromptsFromResponse(promptText: promptText, track: track)
+    }
+    
+    // Method to call ChatGPT (OpenAI) API
+    private func callChatGPTAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
+        // Call to the OpenAI API
+        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Using gpt-4o which has web browsing capabilities
+        let requestBody: [String: Any] = [
+            "model": "gpt-4o",
+            "messages": [
+                ["role": "system", "content": "You are an expert AI assistant that helps create detailed prompt descriptions for AI image generation based on music tracks. You have the ability to browse the web to gather information."],
+                ["role": "user", "content": fullPrompt]
+            ],
+            "temperature": 0.85,
+            "max_tokens": 1500,
+            "response_format": ["type": "json_object"], // Ensure JSON response
+            "tools": [
+                [
+                    "type": "web_search"
+                ]
+            ],
+            "tool_choice": "auto" // Allow the model to decide when to use web search
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "OpenAI API Error"])
+        }
+        
+        // Decode the response
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let choices = json?["choices"] as? [[String: Any]]
+        let messageData = choices?.first?["message"] as? [String: Any]
+        let content = messageData?["content"] as? String ?? ""
+        
+        return try parsePromptsFromResponse(promptText: content, track: track)
+    }
+    
+    // Shared method to parse the response from any LLM
+    private func parsePromptsFromResponse(promptText: String, track: TrackInfo) throws -> [LLMPrompt] {
         var generatedPrompts: [LLMPrompt] = []
         
         do {
-            // Nettoyer la réponse pour s'assurer qu'elle est un JSON valide
+            // Clean the response to ensure it's valid JSON
             let cleanedResponse = cleanJSONResponse(promptText)
             
-            // Essayer de parser le JSON
+            // Try to parse the JSON
             guard let responseData = cleanedResponse.data(using: .utf8) else {
                 throw NSError(domain: "LLMManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unable to convert response to data"])
             }
@@ -194,19 +354,19 @@ class LLMManager: ObservableObject {
                 throw NSError(domain: "LLMManager", code: 3, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON response format"])
             }
             
-            print("LLMManager: \(promptsArray.count) prompts trouvés dans la réponse JSON")
+            print("LLMManager: \(promptsArray.count) prompts found in JSON response")
             
-            // Extraire les prompts et créer des objets LLMPrompt
+            // Extract prompts and create LLMPrompt objects
             for (_, promptDict) in promptsArray.enumerated() {
                 guard let promptText = promptDict["prompt"] as? String,
                       let promptNumber = promptDict["prompt_number"] as? Int else {
                     continue
                 }
                 
-                print("LLMManager: Prompt \(promptNumber) complet:")
-                print("--------- DÉBUT DU PROMPT \(promptNumber) ---------")
+                print("LLMManager: Prompt \(promptNumber) complete:")
+                print("--------- START OF PROMPT \(promptNumber) ---------")
                 print(promptText)
-                print("--------- FIN DU PROMPT \(promptNumber) ---------")
+                print("--------- END OF PROMPT \(promptNumber) ---------")
                 
                 let llmPrompt = LLMPrompt(
                     prompt: promptText,
@@ -222,8 +382,8 @@ class LLMManager: ObservableObject {
                 generatedPrompts.append(llmPrompt)
             }
         } catch {
-            print("LLMManager: Erreur lors du parsing JSON: \(error.localizedDescription)")
-            // En cas d'erreur, créer un seul prompt avec le message d'erreur
+            print("LLMManager: Error during JSON parsing: \(error.localizedDescription)")
+            // In case of error, create a single prompt with the error message
             let errorPrompt = LLMPrompt(
                 prompt: "Processing error: \(error.localizedDescription). Raw response: \(promptText.prefix(100))...",
                 timestamp: Date().timeIntervalSince1970,
@@ -249,17 +409,14 @@ class LLMManager: ObservableObject {
             generatedPrompts = [fallbackPrompt]
         }
         
-        print("LLMManager: \(generatedPrompts.count) prompts générés avec succès!")
-        
-        // Supprimer le test explicite d'envoi des prompts via OSC pour éviter les duplications
-        // Les prompts seront envoyés automatiquement via l'observer dans OSCManager
+        print("LLMManager: \(generatedPrompts.count) prompts generated successfully!")
         
         return generatedPrompts
     }
     
-    // Fonction pour nettoyer la réponse JSON
+    // Function to clean JSON response
     private func cleanJSONResponse(_ response: String) -> String {
-        // Chercher le début de l'accolade ouvrante JSON
+        // Look for the opening JSON brace
         if let jsonStartIndex = response.firstIndex(of: "{"),
            let jsonEndIndex = response.lastIndex(of: "}") {
             let jsonRange = jsonStartIndex...jsonEndIndex
@@ -268,7 +425,7 @@ class LLMManager: ObservableObject {
         return response
     }
     
-    // Fonctions helpers pour convertir les valeurs numériques en niveaux textuels
+    // Helper functions to convert numeric values to text levels
     private func energyLevelString(from energy: Double?) -> String {
         guard let energy = energy else { return "N/A" }
         if energy < 0.33 {
@@ -311,19 +468,19 @@ class LLMManager: ObservableObject {
         displayTimer = nil
     }
     
-    /// Teste la connexion à l'API LLM avec des données fictives
+    /// Test the LLM API connection with dummy data
     func testLLMConnection() async throws {
         let track = TrackInfo(
             title: "Test",
             artist: "Test",
-            artworkURL: nil,
             genre: "Test",
+            artworkURL: nil,
             bpm: 120,
             energy: 0.8,
             danceability: 0.7
         )
         
-        // Utilise la méthode privée pour effectuer un test réel de connexion
+        // Use the private method to perform a real connection test
         let _ = try await fetchPromptsFromAPI(track: track)
         return
     }

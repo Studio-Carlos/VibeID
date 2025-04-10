@@ -27,8 +27,12 @@ struct SettingsView: View {
     // Access OSCManager for connection testing
     private let oscManager = OSCManager()
 
-    // Local state for API key SecureField
+    // Local state for API key SecureFields
     @State private var apiKeyInput: String = ""
+    @State private var deepseekAPIKeyInput: String = ""
+    @State private var geminiAPIKeyInput: String = ""
+    @State private var claudeAPIKeyInput: String = ""
+    @State private var chatGPTAPIKeyInput: String = ""
     
     // States for OSC connection test management
     @State private var isTestingConnection: Bool = false
@@ -109,22 +113,15 @@ struct SettingsView: View {
                 // Section for AudD API Key
                 Section("AudD API Key") {
                     SecureField("Paste your AudD API key", text: $apiKeyInput)
-                        // Using the new onChange syntax (iOS 14+ but mandatory in style for iOS 17+)
                         .onChange(of: apiKeyInput) {
-                            // Read current value of bound state
-                            let currentInputValue = apiKeyInput
                             // Update manager when field changes
-                            if currentInputValue.isEmpty {
-                                settings.apiKey = nil
-                            } else {
-                                settings.apiKey = currentInputValue
-                            }
+                            settings.apiKey = apiKeyInput.isEmpty ? nil : apiKeyInput
                         }
                 }
 
                 // Section for OSC Configuration
-                Section("OSC Configuration") {
-                    TextField("Target IP Address (e.g.: 192.168.1.100)", text: $settings.oscHost)
+                Section("OSC Output Configuration") {
+                    TextField("Target IP Address", text: $settings.oscHost)
                         .keyboardType(.URL)
                         .autocorrectionDisabled(true) // Disable auto-correction for IPs
                         .textInputAutocapitalization(.never) // No auto caps
@@ -180,6 +177,56 @@ struct SettingsView: View {
                     }
                 }
                 
+                // New section for OSC input configuration
+                Section("OSC Input Configuration") {
+                    Toggle("Enable OSC Input", isOn: $settings.isOscInputEnabled)
+                        .tint(.blue)
+                    
+                    TextField("Listen Port (e.g.: 8000)", value: $settings.oscListenPort, format: .number)
+                        .keyboardType(.numberPad)
+                    
+                    // Device IP display
+                    if settings.deviceIPAddress != "N/A" && settings.deviceIPAddress != "Loading..." {
+                        HStack {
+                            Text("Device IP:")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+                            Text(settings.deviceIPAddress)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundColor(.cyan)
+                            
+                            Spacer()
+                            
+                            // Button to copy IP address to clipboard
+                            Button(action: {
+                                UIPasteboard.general.string = settings.deviceIPAddress
+                                // Visual feedback
+                                connectionTestMessage = "IP copied!"
+                                connectionTestResult = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    if connectionTestMessage == "IP copied!" {
+                                        connectionTestResult = nil
+                                        connectionTestMessage = ""
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "doc.on.doc")
+                                    .font(.system(size: 14))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    } else {
+                        Text(settings.deviceIPAddress == "Loading..." ? "Loading IP address..." : "Cannot determine device IP")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Text("Format: /vibeid/external/track with value 'song:TITLE from:ARTIST'")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                
                 // Section for Identification Frequency
                 Section("Identification") {
                     Text("Frequency: Every \(settings.recognitionFrequencyMinutes) minutes")
@@ -193,24 +240,45 @@ struct SettingsView: View {
                 }
 
                 // Section for LLM Configuration
-                Section(header: Text("Configuration LLM").foregroundColor(.blue)) {
-                    Picker("Modèle", selection: $settings.selectedLLM) {
+                Section(header: Text("LLM CONFIGURATION").foregroundColor(.blue)) {
+                    Picker("Model", selection: $settings.selectedLLM) {
                         ForEach(LLMType.allCases, id: \.self) { model in
                             Text(model.rawValue).tag(model)
                         }
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     
-                    SecureField("Clé API", text: selectedLLMAPIKey)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    // Use the appropriate SecureField based on selected LLM
+                    switch settings.selectedLLM {
+                    case .deepseek:
+                        SecureField("Paste your DeepSeek API key", text: $deepseekAPIKeyInput)
+                            .onChange(of: deepseekAPIKeyInput) {
+                                settings.deepseekAPIKey = deepseekAPIKeyInput
+                            }
+                    case .gemini:
+                        SecureField("Paste your Gemini API key", text: $geminiAPIKeyInput)
+                            .onChange(of: geminiAPIKeyInput) {
+                                settings.geminiAPIKey = geminiAPIKeyInput
+                            }
+                    case .claude:
+                        SecureField("Paste your Claude API key", text: $claudeAPIKeyInput)
+                            .onChange(of: claudeAPIKeyInput) {
+                                settings.claudeAPIKey = claudeAPIKeyInput
+                            }
+                    case .chatGPT:
+                        SecureField("Paste your OpenAI API key", text: $chatGPTAPIKeyInput)
+                            .onChange(of: chatGPTAPIKeyInput) {
+                                settings.chatGPTAPIKey = chatGPTAPIKeyInput
+                            }
+                    }
                     
                     VStack(alignment: .leading) {
-                        Text("Système Prompt (en anglais)")
+                        Text("System Prompt")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
                         TextEditor(text: $settings.llmSystemPrompt)
-                            .frame(minHeight: 250) // Hauteur augmentée pour voir plus de contenu
+                            .frame(minHeight: 250) // Increased height to see more content
                             .padding(8)
                             .background(Color.black.opacity(0.3))
                             .cornerRadius(8)
@@ -223,7 +291,7 @@ struct SettingsView: View {
                     Button(action: testLLMConnection) {
                         HStack {
                             Image(systemName: "bolt.fill")
-                            Text("Tester la connexion")
+                            Text("Test connection")
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -257,10 +325,27 @@ struct SettingsView: View {
                     .foregroundColor(.blue) // Highlight the OK button
                 }
             }
-            // Load initial API key into text field when view appears
+            // Load initial API keys into text fields when view appears
             .onAppear {
-                // Synchroniser le champ d'entrée avec l'API key de AudD
+                // Synchronize the input fields with stored values
                 apiKeyInput = settings.apiKey ?? ""
+                deepseekAPIKeyInput = settings.deepseekAPIKey
+                geminiAPIKeyInput = settings.geminiAPIKey
+                claudeAPIKeyInput = settings.claudeAPIKey
+                chatGPTAPIKeyInput = settings.chatGPTAPIKey
+            }
+            // Update local input fields when LLM type changes
+            .onChange(of: settings.selectedLLM) { oldValue, newValue in
+                switch newValue {
+                case .deepseek:
+                    deepseekAPIKeyInput = settings.deepseekAPIKey
+                case .gemini:
+                    geminiAPIKeyInput = settings.geminiAPIKey
+                case .claude:
+                    claudeAPIKeyInput = settings.claudeAPIKey
+                case .chatGPT:
+                    chatGPTAPIKeyInput = settings.chatGPTAPIKey
+                }
             }
             // Add modal sheet for diagnostic report
             .sheet(isPresented: $showDiagnosticSheet) {
@@ -304,34 +389,22 @@ struct SettingsView: View {
         }
     } // End body
 
-    // Helper function to get the correct API key binding based on selected LLM
-    private var selectedLLMAPIKey: Binding<String> {
-        switch settings.selectedLLM {
-        case .deepseek:
-            return $settings.deepseekAPIKey
-        case .claude:
-            return $settings.claudeAPIKey
-        case .chatGPT:
-            return $settings.chatGPTAPIKey
-        }
-    }
-
     // Helper function to test LLM connection
     private func testLLMConnection() {
         Task {
             do {
-                // Utiliser la méthode publique testLLMConnection de LLMManager
+                // Use the public testLLMConnection method of LLMManager
                 try await LLMManager.shared.testLLMConnection()
                 
                 await MainActor.run {
                     showingAlert = true
-                    alertTitle = "Succès"
-                    alertMessage = "Connexion à l'API LLM établie avec succès"
+                    alertTitle = "Success"
+                    alertMessage = "LLM API connection established successfully"
                 }
             } catch {
                 await MainActor.run {
                     showingAlert = true
-                    alertTitle = "Erreur"
+                    alertTitle = "Error"
                     alertMessage = error.localizedDescription
                 }
             }

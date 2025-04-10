@@ -26,6 +26,9 @@ struct Vibe_IDApp: App {
     // Network connectivity state
     @StateObject private var networkMonitor = NetworkMonitor()
     
+    // OSC manager for sending messages
+    private let oscService = OSCService.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -40,7 +43,7 @@ struct Vibe_IDApp: App {
                     // Send an OSC message to signal the application's startup
                     Task {
                         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
-                        await sendAppStartedMessage()
+                        oscService.sendStartupMessages()
                     }
                 }
                 .onDisappear {
@@ -51,34 +54,40 @@ struct Vibe_IDApp: App {
     }
 }
 
-// Function to send an OSC message at startup
+// Singleton class to manage OSC messages at application level
 @MainActor
-func sendAppStartedMessage() async {
-    print("Sending initial OSC message after startup...")
+class OSCService {
+    static let shared = OSCService()
     
-    let settingsManager = SettingsManager.shared
-    let oscManager = OSCManager() // Direct initialization without causing conflict
+    // Use the same oscManager from SettingsManager
+    private let settingsManager = SettingsManager.shared
+    private let oscManager = OSCManager()
     
-    if settingsManager.hasValidOSCConfig {
+    private init() {}
+    
+    func getOSCManager() -> OSCManager {
+        return oscManager
+    }
+    
+    func sendStartupMessages() {
+        print("Sending initial OSC message after startup...")
+        
+        guard settingsManager.hasValidOSCConfig else {
+            print("Invalid OSC configuration, no message sent.")
+            return
+        }
+        
         print("Valid OSC configuration, sending message...")
         
-        // Only send messages in standard format
-        oscManager.send(
-            OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/status"), values: ["app_started"]),
-            to: settingsManager.oscHost,
-            port: settingsManager.oscPort
-        )
+        // Send status messages at startup
+        let statusMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/status"), values: ["app_started"])
+        oscManager.send(statusMsg, to: settingsManager.oscHost, port: settingsManager.oscPort)
         
-        // Also send a test ping
-        oscManager.send(
-            OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/test"), values: ["ping"]),
-            to: settingsManager.oscHost,
-            port: settingsManager.oscPort
-        )
+        // Send a test ping
+        let pingMsg = OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/test"), values: ["ping"])
+        oscManager.send(pingMsg, to: settingsManager.oscHost, port: settingsManager.oscPort)
         
         print("Startup OSC messages sent!")
-    } else {
-        print("Invalid OSC configuration, no message sent.")
     }
 }
 

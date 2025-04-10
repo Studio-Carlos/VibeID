@@ -1,0 +1,118 @@
+{
+  "" : {
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-master.dia",
+    "emit-module-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-master-emit-module.dia",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-master.swiftdeps"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/API Evolution/OSCKit-API-0.5.0.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-0.5.0~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/API Evolution/OSCKit-API-1.0.1.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.0.1~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/API Evolution/OSCKit-API-1.2.0.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-API-1.2.0~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCClient.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCClient~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCHandlerBlock.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCHandlerBlock~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCKit.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCKit-04dc81ed7b004d009ebf63a898342525~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCServer.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServer~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCServerProtocol.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerProtocol~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCServerUDPDelegate.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCServerUDPDelegate~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCSocket.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCSocket~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKit/OSCTimeTagMode.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.dia",
+    "index-unit-output-path" : "/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/build/OSCKit.build/Debug-iphonesimulator/OSCKit.build/Objects-normal/arm64/OSCTimeTagMode~partial.swiftmodule"
+  }
+}

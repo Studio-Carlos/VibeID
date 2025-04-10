@@ -1,0 +1,4 @@
+module CocoaAsyncSocket {
+umbrella "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/CocoaAsyncSocket/Source/GCD"
+export *
+}

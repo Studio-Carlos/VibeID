@@ -22,11 +22,17 @@ import OSCKit
 import Darwin
 import Combine
 
+// Define our own OSCServerDelegate protocol for compatibility
+protocol OSCServerDelegate: AnyObject {
+    func didReceive(_ message: OSCKit.OSCMessage)
+}
+
 @MainActor
 class OSCManager {
 
-    // Shared instance for LLM prompts
+    // Shared instances
     private let llmManager = LLMManager.shared
+    private let settingsManager = SettingsManager.shared
     
     // Store cancellables
     private var cancellables = Set<AnyCancellable>()
@@ -35,11 +41,211 @@ class OSCManager {
     private(set) var isConnected = true
     private let oscClient = OSCKit.OSCClient()
     
+    // OSC server for receiving
+    private var oscServer: OSCKit.OSCServer?
+    
+    // Publisher for tracks received via OSC
+    let trackReceivedPublisher = PassthroughSubject<TrackInfo, Never>()
+    
     // Enable detailed logging
-    private var verboseLogging: Bool = true
+    // Make this nonisolated so it can be accessed from Sendable closures
+    private nonisolated let verboseLogging: Bool = true
 
     init() {
-        // OSCManager initialized
+        // Observe OSC configuration changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOscSettingsChanged),
+            name: .oscInputSettingsChanged,
+            object: nil
+        )
+        
+        // Initial configuration of the OSC server
+        setupOscServer()
+    }
+    
+    // Configure the OSC server according to settings
+    @objc private func handleOscSettingsChanged() {
+        setupOscServer()
+    }
+    
+    private func setupOscServer() {
+        // Log the current state
+        print("Setting up OSC server. Input enabled: \(settingsManager.isOscInputEnabled), Port: \(settingsManager.oscListenPort)")
+        
+        // Stop the existing server if there is one
+        if oscServer != nil {
+            stopOscServer()
+            
+            // Wait a short moment to free the port
+            Task {
+                do {
+                    try await Task.sleep(nanoseconds: 500_000_000) // 500ms
+                    startOscServerIfEnabled()
+                } catch {
+                    print("OSCManager: Error during server restart delay: \(error)")
+                }
+            }
+        } else {
+            // No existing server, start directly
+            startOscServerIfEnabled()
+        }
+    }
+    
+    /// Attempts to start the OSC server if OSC input is enabled
+    func startOscServerIfEnabled() {
+        // Check if OSC input is enabled in settings
+        guard settingsManager.isOscInputEnabled else {
+            print("OSC input is disabled. Not starting OSC server.")
+            return
+        }
+        
+        print("Starting OSC server on port \(settingsManager.oscListenPort)")
+        
+        // Make sure we don't have an existing server
+        if oscServer != nil {
+            print("Stopping existing OSC server before creating a new one")
+            stopOscServer()
+        }
+        
+        // Create a new server with the configured port
+        oscServer = OSCKit.OSCServer(port: UInt16(settingsManager.oscListenPort))
+        
+        // Configure the message handler
+        oscServer?.setHandler { [weak self, verboseLogging] message, timeTag, senderHost, senderPort in
+            guard let self = self else { return }
+            
+            // Log message details if verbose logging is enabled
+            if verboseLogging {
+                print("OSC Message received from \(senderHost):\(senderPort)")
+                print("- Address: \(message.addressPattern)")
+                print("- Values: \(message.values)")
+                print("- TimeTag: \(timeTag)")
+            }
+            
+            // Process the message on the main actor
+            Task { @MainActor in
+                self.didReceive(message)
+            }
+        }
+        
+        // Try to start the server
+        do {
+            try oscServer?.start()
+            print("OSC server started successfully on port \(settingsManager.oscListenPort)")
+        } catch {
+            print("Failed to start OSC server: \(error.localizedDescription)")
+            
+            // Check if the error is related to the port being in use
+            let errorString = error.localizedDescription.lowercased()
+            if errorString.contains("address in use") || errorString.contains("port") {
+                print("OSC port \(settingsManager.oscListenPort) already in use. Will try again in 5 seconds.")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                    self?.retryStartOscServer()
+                }
+            }
+        }
+    }
+    
+    /// Retries starting the OSC server (to avoid potential recursion issues)
+    private func retryStartOscServer() {
+        // Make sure we don't have an existing server
+        if oscServer != nil {
+            stopOscServer()
+        }
+        
+        // Check again if OSC input is still enabled
+        guard settingsManager.isOscInputEnabled else {
+            print("OSC input is disabled. Not retrying OSC server.")
+            return
+        }
+        
+        print("Retrying OSC server start on port \(settingsManager.oscListenPort)")
+        
+        // Create a new server with the configured port
+        oscServer = OSCKit.OSCServer(port: UInt16(settingsManager.oscListenPort))
+        
+        // Configure the message handler
+        oscServer?.setHandler { [weak self, verboseLogging] message, timeTag, senderHost, senderPort in
+            guard let self = self else { return }
+            
+            // Log message details if verbose logging is enabled
+            if verboseLogging {
+                print("OSC Message received from \(senderHost):\(senderPort)")
+                print("- Address: \(message.addressPattern)")
+                print("- Values: \(message.values)")
+                print("- TimeTag: \(timeTag)")
+            }
+            
+            // Process the message on the main actor
+            Task { @MainActor in
+                self.didReceive(message)
+            }
+        }
+        
+        // Try to start the server
+        do {
+            try oscServer?.start()
+            print("OSC server started successfully on retry")
+        } catch {
+            print("Failed to start OSC server on retry: \(error.localizedDescription)")
+        }
+    }
+    
+    /// Stops the OSC server if it's running
+    func stopOscServer() {
+        oscServer?.stop()
+        oscServer = nil
+        print("OSC server stopped")
+    }
+    
+    // Process an external track OSC message
+    private func handleExternalTrackMessage(_ message: OSCKit.OSCMessage) {
+        guard message.values.count > 0, let trackValue = message.values[0] as? String else {
+            print("OSCManager: Invalid external track message format")
+            return
+        }
+        
+        // Parse the "song:TITLE from:ARTIST" format
+        let components = trackValue.components(separatedBy: "from:")
+        guard components.count == 2 else {
+            print("OSCManager: Invalid format in track message: \(trackValue)")
+            return
+        }
+        
+        let titlePart = components[0].trimmingCharacters(in: .whitespacesAndNewlines)
+        let artistPart = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Extract the title (after "song:")
+        var title = titlePart
+        if titlePart.hasPrefix("song:") {
+            title = String(titlePart.dropFirst(5)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        
+        // Create TrackInfo with OSC source
+        let trackInfo = TrackInfo(
+            title: title,
+            artist: artistPart,
+            genre: nil,
+            artworkURL: nil,
+            bpm: nil,
+            energy: nil,
+            danceability: nil,
+            source: .osc
+        )
+        
+        // Publish the information so RecognitionViewModel can retrieve it
+        trackReceivedPublisher.send(trackInfo)
+        print("OSCManager: External track received - Title: \(title), Artist: \(artistPart)")
+    }
+
+    deinit {
+        // Properly stop the server without Task
+        if let server = oscServer {
+            server.stop()
+            print("OSCManager: OSC server stopped in deinit")
+        }
+        NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - OSC Message Operations
@@ -247,6 +453,47 @@ class OSCManager {
         }
         
         return report
+    }
+
+    // Method to process OSC messages received
+    func didReceive(_ message: OSCKit.OSCMessage) {
+        // Already on the main thread with @MainActor
+        if verboseLogging {
+            print("OSCManager: Received OSC message: \(message.addressPattern), values: \(message.values)")
+        }
+        
+        // Verify the message address to know what to do
+        let addressPattern = String(describing: message.addressPattern)
+        
+        // Recognized formats:
+        switch addressPattern {
+        case "/vibeid/external/track":
+            handleExternalTrackMessage(message)
+            
+        case "/vibeid/ping", "/vibeid/test":
+            // Ping/test message, respond to confirm that the server is active
+            print("OSCManager: Received ping/test message. Server is active!")
+            
+            // If the message contains a return address and port, send a response
+            if message.values.count >= 2,
+               let returnHost = message.values[0] as? String,
+               let returnPort = message.values[1] as? Int {
+                
+                send(
+                    OSCKit.OSCMessage(OSCKit.OSCAddressPattern("/vibeid/pong"), values: ["Server active"]),
+                    to: returnHost,
+                    port: returnPort
+                )
+            }
+            
+        default:
+            // Unrecognized but process if potentially valid format
+            if addressPattern.hasPrefix("/vibeid/") {
+                print("OSCManager: Received unhandled but valid message pattern: \(addressPattern)")
+            } else {
+                print("OSCManager: Received unknown message pattern: \(addressPattern) - ignoring")
+            }
+        }
     }
 }
 

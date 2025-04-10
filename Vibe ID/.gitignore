@@ -50,8 +50,11 @@ fastlane/test_output
 
 # Secrets - Never commit API keys directly!
 # (Even though the AudD key is managed by Keychain, it's good practice)
-# *.secret
-# .env
+*.secret
+.env
+*.keys
+apikey.*
+credentials.json
 
 # Build Artifacts
 build/

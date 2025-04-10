@@ -1,0 +1,48 @@
+{
+  "" : {
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/SwiftASCII-master.dia",
+    "emit-module-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/SwiftASCII-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/SwiftASCII-master-emit-module.dia",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/SwiftASCII-master.swiftdeps"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/Sources/SwiftASCII/ASCIICharacter.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.dia",
+    "index-unit-output-path" : "/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIICharacter~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/Sources/SwiftASCII/ASCIIString.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.dia",
+    "index-unit-output-path" : "/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/ASCIIString~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/Sources/SwiftASCII/CharacterSet.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.dia",
+    "index-unit-output-path" : "/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/CharacterSet~partial.swiftmodule"
+  },
+  "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/Sources/SwiftASCII/String.swift" : {
+    "const-values" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.swiftconstvalues",
+    "dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.d",
+    "diagnostics" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.dia",
+    "index-unit-output-path" : "/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.o",
+    "llvm-bc" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.bc",
+    "object" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.o",
+    "swift-dependencies" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String.swiftdeps",
+    "swiftmodule" : "/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/SwiftASCII/build/SwiftASCII.build/Debug-iphonesimulator/SwiftASCII.build/Objects-normal/arm64/String~partial.swiftmodule"
+  }
+}

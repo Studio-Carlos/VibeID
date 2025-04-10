@@ -1,0 +1,95 @@
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/API\ Evolution/OSCKitCore-API-1.2.0.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/Component/Component\ Token.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/Component/Component\ evaluate.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/Component/Component\ parse.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/Component/Component.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/OSCAddressPattern\ Strings.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/OSCAddressPattern\ init.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressPattern/OSCAddressPattern.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressSpace/OSCAddressSpace\ MethodID.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressSpace/OSCAddressSpace\ Node.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressSpace/OSCAddressSpace\ Utilities.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCAddressSpace/OSCAddressSpace.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCBundle/OSCBundle\ Data\ Extensions.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCBundle/OSCBundle\ init.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCBundle/OSCBundle\ rawData.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCBundle/OSCBundle.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCKitCore.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCMessage/OSCMessage\ Data\ Extensions.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCMessage/OSCMessage\ init.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCMessage/OSCMessage\ rawData.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCMessage/OSCMessage.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCObject/OSCObject\ Data\ Extensions.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCObject/OSCObject\ Static\ Constructors.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCObject/OSCObject.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCObject/OSCObjectType.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCSerialization/OSCSerialization.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCSerialization/OSCSerializationError.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCSerialization/OSCValueTagIdentity.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag\ Codable.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag\ Properties.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag\ Static\ Constructors.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag\ Utilities.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag\ init.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCTimeTag/OSCTimeTag.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Core\ Types/Data\ (Blob).swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Core\ Types/Float32.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Core\ Types/Int32.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Core\ Types/String.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/Bool.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/Character.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/Double.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/Int64.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCArrayValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCImpulseValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCMIDIValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCNullValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCStringAltValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Extended\ Types/OSCTimeTag\ OSCValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Interpolated\ Types/BinaryFloatingPoint.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Interpolated\ Types/BinaryInteger.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/OSCInterpolatedValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/OSCValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Opaque\ Types/AnyOSCNumberValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Opaque\ Types/OSCNumberValue.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValue/Opaque\ Types/OSCNumberValueBase.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCDecodeError.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCEncodeError.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCMessageDecoder.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCMessageEncoder.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueCodable.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueDecodable.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueDecoder.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueDecoderBlock.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueEncodable.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueCodable/OSCValueEncoderBlock.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueMaskable/OSCValueMaskError.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueMaskable/OSCValueMaskable.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueMaskable/OSCValues\ Mask\ Methods.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueToken/OSCValueToken\ Methods.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValueToken/OSCValueToken.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/OSCValues.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 1\ Value.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 10\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 2\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 3\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 4\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 5\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 6\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 7\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 8\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ 9\ Values.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/OSCValues/Type\ Mask/OSCValues\ Type\ Mask\ Helpers.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Concurrency\ Extensions.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Date\ Extensions.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Hex\ and\ Binary\ String.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Optional.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/CharacterSet.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/Collections.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/Data.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/FloatingPoint\ and\ Darwin.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/Integers.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/Protocols.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/String\ and\ CharacterSet.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/Outsourced/String\ and\ Foundation.swift
+/Users/Carlos/Library/Developer/Xcode/DerivedData/Vibe_ID-dmmoepdwgocejlgssfupldkxkylj/SourcePackages/checkouts/OSCKit/Sources/OSCKitCore/Utilities/String\ Extensions.swift
