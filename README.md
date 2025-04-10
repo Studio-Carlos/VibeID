@@ -5,15 +5,15 @@
 ## Screenshots
 
 ### Main Interface (Idle / Listening)
-![Vibe ID Interface Idle/Listening v2.0](screenshots/vibe-id-idle-v2.0.png)
+![Vibe ID Interface Idle/Listening v2.0](Vibe%20ID/screenshots/vibe-id-idle-v2.0.png)
 *Application ready for music.*
 
 ### Main Interface (Identified Track + Prompts)
-![Vibe ID Results Interface v2.0](screenshots/vibe-id-results-v2.0.png)
+![Vibe ID Results Interface v2.0](Vibe%20ID/screenshots/vibe-id-results-v2.0.png)
 *Display of the identified track and carousel of generated AI prompts.*
 
 ### Settings Panel
-![Vibe ID Settings v2.0](screenshots/vibe-id-settings-v2.0.png)
+![Vibe ID Settings v2.0](Vibe%20ID/screenshots/vibe-id-settings-v2.0.png)
 *Configuration of API keys (AudD, LLMs), OSC parameters (Send/Receive), LLM selection and system prompt.*
 
 ## New in Version 2.0
@@ -129,15 +129,15 @@ This project is licensed under the **GNU GPL v3**. See the [LICENSE](LICENSE) fi
 ## Captures d'Écran
 
 ### Interface Principale (Repos / Écoute)
-![Vibe ID Interface Repos/Écoute v2.0](screenshots/vibe-id-idle-v2.0.png)
+![Vibe ID Interface Repos/Écoute v2.0](Vibe%20ID/screenshots/vibe-id-idle-v2.0.png)
 *Application prête ou en écoute active de la musique.*
 
 ### Interface Principale (Morceau Identifié + Prompts)
-![Vibe ID Interface Résultats v2.0](screenshots/vibe-id-results-v2.0.png)
+![Vibe ID Interface Résultats v2.0](Vibe%20ID/screenshots/vibe-id-results-v2.0.png)
 *Affichage du morceau identifié et du carrousel de prompts IA générés.*
 
 ### Panneau des Réglages
-![Vibe ID Réglages v2.0](screenshots/vibe-id-settings-v2.0.png)
+![Vibe ID Réglages v2.0](Vibe%20ID/screenshots/vibe-id-settings-v2.0.png)
 *Configuration des clés API (AudD, LLMs), des paramètres OSC (Envoi/Réception), du choix du LLM et du prompt système.*
 
 ## Nouveautés de la Version 2.0
