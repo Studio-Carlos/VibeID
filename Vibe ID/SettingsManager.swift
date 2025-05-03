@@ -62,7 +62,7 @@ class SettingsManager: ObservableObject {
     // Default values
     private let defaultOSCHost = "127.0.0.1"
     private let defaultOSCPort = 8000
-    private let defaultOscListenPort = 7401
+    private let defaultOscListenPort = 9000
     private let defaultRecognitionFrequencyMinutes = 5
     private let defaultAudDAPIKey = ""
     private let defaultDeepSeekAPIKey = ""

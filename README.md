@@ -67,7 +67,7 @@ This version introduces major features transforming Vibe ID into a true creative
 
 ## Installation
 
-1. Clone the GitHub repository.
+1. Clone the GitHub repository: https://github.com/Studio-Carlos/VibeID
 2. Open `Vibe ID.xcodeproj` in Xcode.
 3. Resolve SPM dependencies if necessary (File > Packages > Resolve...).
 4. Compile and launch on iOS device.
