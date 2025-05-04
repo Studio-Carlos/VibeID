@@ -28,10 +28,13 @@ struct SettingsView: View {
     private let oscManager = OSCManager()
 
     // Local state for API key SecureFields
-    @State private var apiKeyInput: String = ""
+    @State private var auddAPIKeyInput: String = ""
+    @State private var acrHostInput: String = ""
+    @State private var acrAccessKeyInput: String = ""
+    @State private var acrSecretKeyInput: String = ""
     @State private var deepseekAPIKeyInput: String = ""
     @State private var geminiAPIKeyInput: String = ""
-    @State private var claudeAPIKeyInput: String = ""
+    @State private var groqAPIKeyInput: String = ""
     @State private var chatGPTAPIKeyInput: String = ""
     
     // States for OSC connection test management
@@ -110,13 +113,78 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Section for AudD API Key
-                Section("AudD API Key") {
-                    SecureField("Paste your AudD API key", text: $apiKeyInput)
-                        .onChange(of: apiKeyInput) {
-                            // Update manager when field changes
-                            settings.apiKey = apiKeyInput.isEmpty ? nil : apiKeyInput
+                // Section for Music ID Provider Selection & Keys
+                Section(header: Text("Music Identification")) {
+                    // Provider Picker
+                    Picker("Provider", selection: $settings.musicIDProvider) {
+                        ForEach(MusicIDProvider.allCases) { provider in
+                            Text(provider.displayName).tag(provider)
                         }
+                    }
+                    .pickerStyle(.segmented)
+                    
+                    // Conditional Fields based on Provider
+                    switch settings.musicIDProvider {
+                    case .audd:
+                        VStack(alignment: .leading) {
+                             Text("AudD API Key")
+                                 .font(.caption)
+                                 .foregroundColor(.gray)
+                             SecureField("Paste your AudD API key", text: $auddAPIKeyInput)
+                                 .onChange(of: auddAPIKeyInput) {
+                                     settings.auddAPIKey = auddAPIKeyInput
+                                 }
+                         }
+                         .padding(.vertical, 4)
+                         
+                    case .acrCloud:
+                         VStack(alignment: .leading) {
+                             Text("ACRCloud Host")
+                                 .font(.caption)
+                                 .foregroundColor(.gray)
+                             TextField("e.g., identify-eu-west-1.acrcloud.com", text: $acrHostInput)
+                                 .onChange(of: acrHostInput) {
+                                      settings.acrHost = acrHostInput
+                                 }
+                                 .keyboardType(.URL)
+                                 .textContentType(.URL)
+                                 .autocorrectionDisabled(true)
+                                 .textInputAutocapitalization(.never)
+
+                             Text("ACRCloud Access Key")
+                                 .font(.caption)
+                                 .foregroundColor(.gray)
+                             SecureField("Paste your ACRCloud Access key", text: $acrAccessKeyInput)
+                                 .onChange(of: acrAccessKeyInput) {
+                                      settings.acrAccessKey = acrAccessKeyInput
+                                 }
+                                 
+                             Text("ACRCloud Secret Key")
+                                 .font(.caption)
+                                 .foregroundColor(.gray)
+                             SecureField("Paste your ACRCloud Secret key", text: $acrSecretKeyInput)
+                                 .onChange(of: acrSecretKeyInput) {
+                                      settings.acrSecretKey = acrSecretKeyInput
+                                 }
+                         }
+                         .padding(.vertical, 4)
+                    }
+                    
+                    // Identification Frequency (moved here)
+                    VStack(alignment: .leading) {
+                         Text("Identification Frequency")
+                             .font(.caption)
+                             .foregroundColor(.gray)
+                         HStack {
+                             Text("Every \(settings.recognitionFrequencyMinutes) min")
+                             Slider(value: Binding(
+                                 get: { Double(settings.recognitionFrequencyMinutes) },
+                                 set: { settings.recognitionFrequencyMinutes = Int($0) }
+                                ),
+                                    in: 1...10, step: 1)
+                         }
+                     }
+                     .padding(.top, 8)
                 }
 
                 // Section for OSC Configuration
@@ -227,18 +295,6 @@ struct SettingsView: View {
                         .foregroundColor(.gray)
                 }
                 
-                // Section for Identification Frequency
-                Section("Identification") {
-                    Text("Frequency: Every \(settings.recognitionFrequencyMinutes) minutes")
-                    Slider(value: Binding(
-                        get: { Double(settings.recognitionFrequencyMinutes) },
-                        set: { settings.recognitionFrequencyMinutes = Int($0) }
-                       ),
-                           in: 1...10, // Range from 1 to 10
-                           step: 1      // Step of 1
-                    )
-                }
-
                 // Section for LLM Configuration
                 Section(header: Text("LLM CONFIGURATION").foregroundColor(.blue)) {
                     Picker("Model", selection: $settings.selectedLLM) {
@@ -260,10 +316,10 @@ struct SettingsView: View {
                             .onChange(of: geminiAPIKeyInput) {
                                 settings.geminiAPIKey = geminiAPIKeyInput
                             }
-                    case .claude:
-                        SecureField("Paste your Claude API key", text: $claudeAPIKeyInput)
-                            .onChange(of: claudeAPIKeyInput) {
-                                settings.claudeAPIKey = claudeAPIKeyInput
+                    case .groq:
+                        SecureField("Paste your Groq API key", text: $groqAPIKeyInput)
+                            .onChange(of: groqAPIKeyInput) {
+                                settings.groqAPIKey = groqAPIKeyInput
                             }
                     case .chatGPT:
                         SecureField("Paste your OpenAI API key", text: $chatGPTAPIKeyInput)
@@ -325,27 +381,24 @@ struct SettingsView: View {
                     .foregroundColor(.blue) // Highlight the OK button
                 }
             }
-            // Load initial API keys into text fields when view appears
+            // Load initial keys into text fields when view appears
             .onAppear {
-                // Synchronize the input fields with stored values
-                apiKeyInput = settings.apiKey ?? ""
+                // Synchronize all input fields with stored values
+                auddAPIKeyInput = settings.auddAPIKey
+                acrHostInput = settings.acrHost
+                acrAccessKeyInput = settings.acrAccessKey
+                acrSecretKeyInput = settings.acrSecretKey
                 deepseekAPIKeyInput = settings.deepseekAPIKey
                 geminiAPIKeyInput = settings.geminiAPIKey
-                claudeAPIKeyInput = settings.claudeAPIKey
+                groqAPIKeyInput = settings.groqAPIKey
                 chatGPTAPIKeyInput = settings.chatGPTAPIKey
             }
-            // Update local input fields when LLM type changes
+            // Update local input fields when provider or LLM type changes
+            .onChange(of: settings.musicIDProvider) { oldValue, newValue in
+                 syncInputFieldsForProvider(newValue)
+            }
             .onChange(of: settings.selectedLLM) { oldValue, newValue in
-                switch newValue {
-                case .deepseek:
-                    deepseekAPIKeyInput = settings.deepseekAPIKey
-                case .gemini:
-                    geminiAPIKeyInput = settings.geminiAPIKey
-                case .claude:
-                    claudeAPIKeyInput = settings.claudeAPIKey
-                case .chatGPT:
-                    chatGPTAPIKeyInput = settings.chatGPTAPIKey
-                }
+                syncInputFieldsForLLM(newValue)
             }
             // Add modal sheet for diagnostic report
             .sheet(isPresented: $showDiagnosticSheet) {
@@ -388,6 +441,32 @@ struct SettingsView: View {
             )
         }
     } // End body
+
+    // Helper function to sync input fields when provider changes
+    private func syncInputFieldsForProvider(_ provider: MusicIDProvider) {
+        switch provider {
+        case .audd:
+            auddAPIKeyInput = settings.auddAPIKey
+        case .acrCloud:
+            acrHostInput = settings.acrHost
+            acrAccessKeyInput = settings.acrAccessKey
+            acrSecretKeyInput = settings.acrSecretKey
+        }
+    }
+    
+    // Helper function to sync input fields when LLM changes
+    private func syncInputFieldsForLLM(_ llm: LLMType) {
+        switch llm {
+        case .deepseek:
+            deepseekAPIKeyInput = settings.deepseekAPIKey
+        case .gemini:
+            geminiAPIKeyInput = settings.geminiAPIKey
+        case .groq:
+            groqAPIKeyInput = settings.groqAPIKey
+        case .chatGPT:
+            chatGPTAPIKeyInput = settings.chatGPTAPIKey
+        }
+    }
 
     // Helper function to test LLM connection
     private func testLLMConnection() {

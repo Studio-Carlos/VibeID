@@ -22,8 +22,8 @@ import Combine
 
 enum LLMType: String, CaseIterable {
     case deepseek = "DeepSeek"
+    case groq = "Groq"
     case gemini = "Gemini"
-    case claude = "Claude"
     case chatGPT = "ChatGPT"
 }
 
@@ -154,8 +154,8 @@ class LLMManager: ObservableObject {
             return try await callDeepSeekAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
         case .gemini:
             return try await callGeminiAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
-        case .claude:
-            return try await callClaudeAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
+        case .groq:
+            return try await callGroqAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
         case .chatGPT:
             return try await callChatGPTAPI(apiKey: apiKey, fullPrompt: fullPrompt, track: track)
         }
@@ -253,42 +253,51 @@ class LLMManager: ObservableObject {
         return try parsePromptsFromResponse(promptText: textPart, track: track)
     }
     
-    // Method to call Claude API
-    private func callClaudeAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
-        // Call to the Claude API
-        let url = URL(string: "https://api.anthropic.com/v1/messages")!
+    // Method to call Groq API
+    private func callGroqAPI(apiKey: String, fullPrompt: String, track: TrackInfo) async throws -> [LLMPrompt] {
+        // Call to the Groq API
+        let url = URL(string: "https://api.groq.com/openai/v1/chat/completions")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "x-api-key")
-        request.setValue("anthropic-ai/v1", forHTTPHeaderField: "anthropic-version")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let requestBody: [String: Any] = [
-            "model": "claude-3-opus-20240229",
-            "max_tokens": 1500,
-            "temperature": 0.85,
-            "system": "You are an expert AI assistant that helps create detailed prompt descriptions for AI image generation based on music tracks.",
+            "model": "llama-3.1-8b-instant",
             "messages": [
                 ["role": "user", "content": fullPrompt]
-            ]
+            ],
+            "temperature": 0.85,
+            "max_tokens": 1100
         ]
         
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Claude API Error"])
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "LLMManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid HTTP response from Groq API"])
+        }
+        
+        if !(200...299).contains(httpResponse.statusCode) {
+            // Try to parse error message from response
+            let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let errorMessage = errorJson?["error"] as? [String: Any]
+            let message = errorMessage?["message"] as? String ?? "Unknown error"
+            
+            print("LLMManager: Groq API Error - Status: \(httpResponse.statusCode), Message: \(message)")
+            throw NSError(domain: "LLMManager", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Groq API Error: \(message)"])
         }
         
         // Decode the response
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let content = json?["content"] as? [[String: Any]]
-        let textBlock = content?.first(where: { ($0["type"] as? String) == "text" })
-        let promptText = textBlock?["text"] as? String ?? ""
+        let choices = json?["choices"] as? [[String: Any]]
+        let messageData = choices?.first?["message"] as? [String: Any]
+        let content = messageData?["content"] as? String ?? ""
         
-        return try parsePromptsFromResponse(promptText: promptText, track: track)
+        print("LLMManager: Groq API Response received - Content length: \(content.count)")
+        
+        return try parsePromptsFromResponse(promptText: content, track: track)
     }
     
     // Method to call ChatGPT (OpenAI) API

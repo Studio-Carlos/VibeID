@@ -78,6 +78,9 @@ class RecognitionViewModel: ObservableObject {
     // LLM Manager for prompt generation
     public let llmManager = LLMManager.shared
     
+    // Use the protocol type for the recognizer
+    private var musicRecognizer: MusicRecognizer? 
+    
     // For storing cancellations
     private var cancellables = Set<AnyCancellable>()
 
@@ -90,6 +93,29 @@ class RecognitionViewModel: ObservableObject {
                 self?.handleExternalTrackInfo(trackInfo)
             }
             .store(in: &cancellables)
+        
+        // Subscribe to settings changes to update the recognizer
+        settingsManager.$musicIDProvider
+            .combineLatest(settingsManager.$auddAPIKey)
+            .receive(on: DispatchQueue.main) // Ensure updates on main thread
+            .sink { [weak self] _, _ in
+                print("RecognitionViewModel: Settings changed, updating music recognizer...")
+                self?.updateMusicRecognizer()
+            }
+            .store(in: &cancellables)
+            
+        // Also subscribe to ACR credentials changes separately
+        settingsManager.$acrHost
+            .combineLatest(settingsManager.$acrAccessKey, settingsManager.$acrSecretKey)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _, _, _ in
+                print("RecognitionViewModel: ACR credentials changed, updating music recognizer...")
+                self?.updateMusicRecognizer()
+            }
+            .store(in: &cancellables)
+            
+        // Initial setup of the recognizer
+        updateMusicRecognizer()
     }
 
     deinit {
@@ -183,36 +209,38 @@ class RecognitionViewModel: ObservableObject {
 
         if shouldStartListening { // === START ATTEMPT ===
             print("--- Beginning of START block ---")
-            print("Settings Check: hasValidAPIKey = \(settingsManager.hasValidAPIKey) (Key: '\(settingsManager.apiKey ?? "nil")')") // Debug
-            guard settingsManager.hasValidAPIKey else {
-                statusMessage = "Error: AudD API key missing."
-                print(">>> START FAILURE: API key missing or empty.")
+            // Check if a recognizer is available and configured
+            guard let currentRecognizer = musicRecognizer else {
+                 statusMessage = "Error: Music Recognizer not available or configured."
+                 print(">>> START FAILURE: Music Recognizer is nil (Check provider & credentials).")
+                 return
+            }
+            print("--- Recognizer Available: \(type(of: currentRecognizer)) ---")
+            
+            // Check if *selected* provider keys are valid
+            guard settingsManager.hasValidMusicIDKeys else {
+                statusMessage = "Error: API keys missing for \(settingsManager.musicIDProvider.displayName)."
+                print(">>> START FAILURE: API keys missing for selected provider.")
                 return
             }
+            print("--- API Keys OK for \(settingsManager.musicIDProvider.displayName) ---")
 
-            print("--- API Key OK ---")
-            isListening = true // Activate state
+            isListening = true
             statusMessage = "Listening..."
             print("Toggle Listening: isListening set to \(isListening)")
 
-            // Direct method calls instead of using Task { @MainActor }
-            print(">>> Attempting direct call sendTestOSCMessage...")
             sendTestOSCMessage(message: "listening_started")
-
-            print(">>> Attempting direct call startIdentificationTimers...")
             startIdentificationTimers()
             
-            print("--- End of START block (direct calls) ---")
+            print("--- End of START block ---")
 
         } else { // === STOP ===
              print("--- Beginning of STOP block ---")
-             isListening = false // Deactivate state
+             isListening = false
              print("Toggle Listening: isListening set to \(isListening)")
 
              statusMessage = "Stopping..."
              stopListening()
-             print(">>> Attempting direct call sendTestOSCMessage (stop)...")
-             // Direct call instead of using Task
              sendTestOSCMessage(message: "listening_stopped")
              statusMessage = "Ready"
         }
@@ -305,274 +333,338 @@ class RecognitionViewModel: ObservableObject {
 
      func stopListening() {
          print("RecognitionViewModel: Stop operations requested...")
-        // Cancel any running identifications
-         print("RecognitionViewModel: Cancellation request to AudioCaptureManager...")
-         audioManager.cancelRecording()
-         print("RecognitionViewModel: Cancellation request to AudDAPIManager...")
-        apiManager.cancelRequest()
+         // Cancel any running identifications via the protocol
+         print("RecognitionViewModel: Cancellation request via MusicRecognizer protocol...")
+         musicRecognizer?.cancel()
         
-        // Reset state when we stop listening
+         // Cancel audio recording separately if needed (depends on implementation)
+         audioManager.cancelRecording() 
+        
         isPerformingIdentification = false
-        
-        // Important: When we stop listening, do not reset the list of prompts
-        // but reset the LLM state so the interface reflects the correct state
         llmState = .idle
         
-        // Stop and invalidate timers
-        print("Stopping Display Timer (Countdown).")
-        identificationTimer?.invalidate()
-        identificationTimer = nil
-        countdownTimer?.invalidate()
-        countdownTimer = nil
+        stopIdentificationTimer()
+        stopDisplayTimer() // Call the correct stop function
+        timeUntilNextIdentification = nil // Ensure countdown is cleared
+        print("RecognitionViewModel: Listening stopped, timers invalidated.")
     }
 
      private func performIdentification() {
-         print("--- performIdentification called ---")
-        // Initialize OSCManager
-        _ = OSCManager()
+         print("--- performIdentification called --- Provider: \(settingsManager.musicIDProvider.displayName)")
+         _ = OSCManager() // Ensure initialized
         
-        guard !isPerformingIdentification else {
-            print("performIdentification: Already performing identification, ignoring.")
-              return
+         guard !isPerformingIdentification else {
+             print("performIdentification: Already performing identification, ignoring.")
+             return
+         }
+         
+         // Ensure we have a valid recognizer instance
+         guard let recognizer = musicRecognizer else {
+             print("performIdentification: ERROR - No music recognizer available.")
+             statusMessage = "Error: Music Recognizer not configured."
+             // Potentially stop listening or prevent retries?
+             isListening = false // Stop listening if recognizer is gone
+             stopIdentificationTimer()
+             stopDisplayTimer()
+             return
          }
 
-        isPerformingIdentification = true
-        latestTrack = nil
-        // Reset LLM state
-        llmState = .idle
+         isPerformingIdentification = true
+         latestTrack = nil // Clear previous track info
+         llmState = .idle
+         statusMessage = "Identifying... (using \(settingsManager.musicIDProvider.displayName))"
         
-        // Reset countdown timer
          timeUntilNextIdentification = settingsManager.recognitionFrequencyMinutes * 60
-        lastIdentificationTime = Date()
+         lastIdentificationTime = Date()
 
-         print("RecognitionViewModel: Starting audio recording...")
-        Task { @MainActor in
-            do {
-                // Capture audio
-                let audioURL = try await audioManager.recordSnippet()
-                   print("Audio recording successful: \(audioURL.lastPathComponent)")
-                
-                // Start identification against AudD
-                print("AudDAPIManager: Starting recognition for \(audioURL.lastPathComponent)")
-                let result = try await apiManager.recognizeAsync(audioFileURL: audioURL, apiKey: settingsManager.apiKey ?? "")
-                
-                // Process identification result
-                if let audDResult = result {
-                    print("Song identified: \(audDResult.title ?? "Unknown")")
-                    
-                    // Convert AudDResult to TrackInfo
-                    let track = TrackInfo(
-                        title: audDResult.title,
-                        artist: audDResult.artist,
-                        genre: audDResult.estimatedGenre,
-                        artworkURL: audDResult.spotify?.album?.images?.first?.url != nil ?
-                            URL(string: audDResult.spotify?.album?.images?.first?.url ?? "") :
-                            audDResult.apple_music?.artwork?.artworkURL(width: 300, height: 300),
-                        bpm: audDResult.estimatedBpm,
-                        energy: audDResult.estimatedEnergy,
-                        danceability: audDResult.estimatedDanceability,
-                        source: .audD // Specify source as AudD
-                    )
-                    
-                    // Update the UI with the identified track
-                    latestTrack = track
-                    
-                    // Send track info via OSC
-                    print("Sending track info to OSC...")
-                    await sendTrackInfo(track: track)
-                    print("Track info sent to OSC")
-                    
-                    // Transition to LLM prompt generation if we have valid config
-                    if SettingsManager.shared.hasValidLLMConfig {
-                        print("OSCManager Initialized")
-                        
-                        // Set state as generating to display animation
-                        llmState = .generating
-                        
-                        // Generate prompts in the background
-                        Task {
-                            // Wait to show animation
-                            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second to see animation
-                            
-                            do {
-                                await llmManager.generatePrompts(for: track)
-                                handleLLMState()
-                            }
-                        }
-                    }
-                        } else {
-                    statusMessage = "No match found"
-                    print("No song identified")
-                        }
-                
-            } catch {
-                print("Error during identification: \(error.localizedDescription)")
-                statusMessage = "Error: \(error.localizedDescription)"
-                   }
-            
-            isPerformingIdentification = false
+         print("RecognitionViewModel: Starting identification via \(type(of: recognizer))...")
+         Task { @MainActor in
+             var identifiedTrack: RecognizedTrack? = nil // Use the protocol's track type
+             var identificationError: Error? = nil
+             
+             do {
+                 // Use the MusicRecognizer protocol method
+                 // Note: AudD implementation currently throws an error here.
+                 identifiedTrack = try await recognizer.identify(seconds: 12) // Use a default duration
+                 
+                 if let track = identifiedTrack, (track.title != nil || track.artist != nil) {
+                      print("RecognitionViewModel: Match found by \(settingsManager.musicIDProvider.displayName) - \(track.artist ?? "?") - \(track.title ?? "?")")
+                      statusMessage = "Match: \(track.title ?? "Unknown")" 
+                 } else {
+                      print("RecognitionViewModel: No match found by \(settingsManager.musicIDProvider.displayName)." )
+                      statusMessage = "No match found"
+                 }
+                 
+             } catch let error {
+                 print("RecognitionViewModel: Error during identification: \(error.localizedDescription)")
+                 identificationError = error
+                 // Use specific error messages
+                 if let acrError = error as? ACRCloudServiceError {
+                     statusMessage = "ACR Error: \(acrError.localizedDescription)"
+                 } else if let auddError = error as? AudDAPIError {
+                      statusMessage = "AudD Error: \(auddError.localizedDescription)"
+                 } else if error is CancellationError {
+                     statusMessage = "Identification cancelled."
+                 } else {
+                      statusMessage = "Error: \(error.localizedDescription)"
+                 }
+             }
+             
+             // --- Post-identification processing --- 
+             isPerformingIdentification = false
+             
+             // If a track was successfully identified, process it
+             if let recognizedTrack = identifiedTrack, identificationError == nil {
+                 // Convert RecognizedTrack to TrackInfo for the rest of the app
+                 let trackInfo = mapRecognizedTrackToTrackInfo(recognizedTrack)
+                 
+                 // Update UI
+                 self.latestTrack = trackInfo
+                 
+                 // Send via OSC
+                 print("Sending track info to OSC...")
+                 await sendTrackInfo(track: trackInfo)
+                 print("Track info sent to OSC")
+                 
+                 // Generate LLM prompts if configured
+                 if SettingsManager.shared.hasValidLLMConfig {
+                     print("Triggering LLM prompt generation...")
+                     llmState = .generating
+                     Task {
+                         await llmManager.generatePrompts(for: trackInfo) // Use TrackInfo
+                         handleLLMState()
+                         // Resend track info *after* prompts are added
+                         if let updatedTrack = self.latestTrack { 
+                              print("Resending track info with prompts...")
+                              await self.sendTrackInfo(track: updatedTrack)
+                         }
+                     }
+                 }
+             }
+             // If no track was identified (but no error occurred), status is already "No match found"
+             // If an error occurred, status message is already set
+             
+             // Reset countdown display timer *after* identification attempt completes
+             // This ensures the countdown reflects the *next* identification cycle
+             timeUntilNextIdentification = settingsManager.recognitionFrequencyMinutes * 60 
          }
      }
-
-     // --- OSC Functions ---
-     private func sendTestOSCMessage(message: String) {
-        print("--- sendTestOSCMessage called ---")
-        print("OSC Test: Checking configuration...")
-        guard settingsManager.hasValidOSCConfig else {
-            print(">>> OSC Test: Not configured, skip. Host='\(settingsManager.oscHost)', Port=\(settingsManager.oscPort)")
-            return
-        }
-        print(">>> OSC Test: Config OK. Calling oscManager.send (Test: \(message))...")
-
-        // Only use standardized OSC address with the /vibeid/ prefix
-        oscManager.sendStatusMessage(status: message, 
-                                    host: settingsManager.oscHost, 
-                                    port: settingsManager.oscPort)
-    } // End func sendTestOSCMessage
-    
-    /// Send a generic OSC message with the specified address and values
-    func sendOscMessage(address: String, values: [Any]) {
-        guard settingsManager.hasValidOSCConfig else {
-            print("RecognitionViewModel: Invalid OSC configuration, message not sent")
-            return
+     
+    // Updates the music recognizer based on the current settings
+    private func updateMusicRecognizer() {
+        print("RecognitionViewModel: Updating music recognizer based on settings...")
+        
+        // Clear previous recognizer
+        musicRecognizer = nil
+        
+        // Create the appropriate recognizer based on selected provider
+        switch settingsManager.musicIDProvider {
+        case .audd:
+            if !settingsManager.auddAPIKey.isEmpty {
+                print("RecognitionViewModel: Creating AudD recognizer instance")
+                musicRecognizer = AudDAPIManager() // Initialize without parameters
+            } else {
+                print("RecognitionViewModel: Cannot create AudD recognizer - missing API key")
+            }
+            
+        case .acrCloud:
+            if !settingsManager.acrCreds.host.isEmpty && 
+               !settingsManager.acrCreds.key.isEmpty && 
+               !settingsManager.acrCreds.secret.isEmpty {
+                print("RecognitionViewModel: Creating ACRCloud recognizer instance")
+                musicRecognizer = ACRCloudService(creds: settingsManager.acrCreds)
+            } else {
+                print("RecognitionViewModel: Cannot create ACRCloud recognizer - missing credentials")
+            }
         }
         
-        // Use existing OSCManager methods directly
-        if address == "/vibeid/status" && values.count == 1, let status = values[0] as? String {
-            // For status messages, use sendStatusMessage
-            oscManager.sendStatusMessage(status: status, 
-                                        host: settingsManager.oscHost, 
-                                        port: settingsManager.oscPort)
-        } else if address == "/vibeid/test" {
-            // For test/ping messages
-            oscManager.sendPing(to: settingsManager.oscHost, port: settingsManager.oscPort)
-        } else {
-            // For other unhandled messages, simply log them
-            print("RecognitionViewModel: Unhandled OSC message - Address: \(address), Values: \(values)")
+        // Update status if no recognizer could be created
+        if musicRecognizer == nil {
+            print("RecognitionViewModel: Warning - No music recognizer available")
+            // Don't set statusMessage here to avoid overriding current UI state
         }
     }
-    
-   /// Sends track info via OSC if configured
-   private func sendTrackInfo(track: TrackInfo) async {
-       print("RecognitionViewModel: Sending track information")
-       
-       // Check OSC configuration
-       guard SettingsManager.shared.hasValidOSCConfig else {
-           print("RecognitionViewModel: Invalid OSC configuration")
+
+    // Helper to map RecognizedTrack to the app's main TrackInfo model
+    private func mapRecognizedTrackToTrackInfo(_ recognizedTrack: RecognizedTrack) -> TrackInfo {
+        // Create TrackInfo instance, mapping relevant fields
+        let trackInfo = TrackInfo(
+            title: recognizedTrack.title,
+            artist: recognizedTrack.artist,
+            album: recognizedTrack.album,
+            releaseDate: recognizedTrack.releaseDate,
+            genre: recognizedTrack.genre,
+            spotifyID: recognizedTrack.spotifyID,
+            appleID: recognizedTrack.appleID,
+            artworkURL: recognizedTrack.artworkURL,
+            // TODO: Map BPM, energy, danceability if ACRCloud provides them
+            bpm: nil, 
+            energy: nil,
+            danceability: nil,
+            // Determine source based on the actual recognizer type (could be stored/checked)
+            source: settingsManager.musicIDProvider == .acrCloud ? .acrCloud : .audD 
+             // Note: Temporarily mapping source like this. A better way might be needed.
+        )
+        // We don't map prompts here; LLMManager handles that.
+        return trackInfo
+    }
+
+    // --- OSC Functions ---
+    private func sendTestOSCMessage(message: String) {
+       print("--- sendTestOSCMessage called ---")
+       print("OSC Test: Checking configuration...")
+       guard settingsManager.hasValidOSCConfig else {
+           print(">>> OSC Test: Not configured, skip. Host='\(settingsManager.oscHost)', Port=\(settingsManager.oscPort)")
+           return
+       }
+       print(">>> OSC Test: Config OK. Calling oscManager.send (Test: \(message))...")
+
+       // Only use standardized OSC address with the /vibeid/ prefix
+       oscManager.sendStatusMessage(status: message, 
+                                   host: settingsManager.oscHost, 
+                                   port: settingsManager.oscPort)
+   } // End func sendTestOSCMessage
+   
+   /// Send a generic OSC message with the specified address and values
+   func sendOscMessage(address: String, values: [Any]) {
+       guard settingsManager.hasValidOSCConfig else {
+           print("RecognitionViewModel: Invalid OSC configuration, message not sent")
            return
        }
        
-       // Send track information
-       oscManager.sendTrackInfo(track: track, host: SettingsManager.shared.oscHost, port: SettingsManager.shared.oscPort)
-   }
-
-   // Add a method to handle LLM states
-   public func handleLLMState() {
-       Task { @MainActor in
-           // Check if LLM is generating
-           if llmManager.isGenerating {
-               print("RecognitionViewModel: Generating prompts in progress...")
-               llmState = .generating
-               return
-           }
-           
-           // Check if there's an error
-           if let error = llmManager.errorMessage {
-               print("RecognitionViewModel: Error during prompts generation: \(error)")
-               llmState = .error(error)
-               return
-           }
-           
-           // Check if prompts are available
-           let prompts = llmManager.currentPrompts
-           if !prompts.isEmpty {
-               print("RecognitionViewModel: \(prompts.count) prompts generated successfully!")
-               
-               // Update prompts in latestTrack
-               if var track = latestTrack {
-                   for (index, prompt) in prompts.enumerated() {
-                       switch index {
-                       case 0: track.prompt1 = prompt.prompt
-                       case 1: track.prompt2 = prompt.prompt
-                       case 2: track.prompt3 = prompt.prompt
-                       case 3: track.prompt4 = prompt.prompt
-                       case 4: track.prompt5 = prompt.prompt
-                       case 5: track.prompt6 = prompt.prompt
-                       case 6: track.prompt7 = prompt.prompt
-                       case 7: track.prompt8 = prompt.prompt
-                       case 8: track.prompt9 = prompt.prompt
-                       case 9: track.prompt10 = prompt.prompt
-                       default: break
-                       }
-                   }
-                   latestTrack = track
-                   
-                   // Send updated information via OSC
-                   await sendTrackInfo(track: track)
-               }
-               
-               llmState = .success(prompts)
-               return
-           }
-           
-           // Default to idle
-           print("RecognitionViewModel: LLM state: idle")
-           llmState = .idle
+       // Use existing OSCManager methods directly
+       if address == "/vibeid/status" && values.count == 1, let status = values[0] as? String {
+           // For status messages, use sendStatusMessage
+           oscManager.sendStatusMessage(status: status, 
+                                       host: settingsManager.oscHost, 
+                                       port: settingsManager.oscPort)
+       } else if address == "/vibeid/test" {
+           // For test/ping messages
+           oscManager.sendPing(to: settingsManager.oscHost, port: settingsManager.oscPort)
+       } else {
+           // For other unhandled messages, simply log them
+           print("RecognitionViewModel: Unhandled OSC message - Address: \(address), Values: \(values)")
        }
    }
+   
+  /// Sends track info via OSC if configured
+  private func sendTrackInfo(track: TrackInfo) async {
+      print("RecognitionViewModel: Sending track information")
+      
+      // Check OSC configuration
+      guard SettingsManager.shared.hasValidOSCConfig else {
+          print("RecognitionViewModel: Invalid OSC configuration")
+          return
+      }
+      
+      // Send track information
+      oscManager.sendTrackInfo(track: track, host: SettingsManager.shared.oscHost, port: SettingsManager.shared.oscPort)
+  }
 
-   // Method to cancel ongoing identification
-   func cancelIdentification() {
-       print("RecognitionViewModel: Cancelling ongoing identification")
-       
-       // Stop listening
-       isListening = false
-       
-       // Stop recognition timer
-       identificationTimer?.invalidate()
-       identificationTimer = nil
-       
-       // Reset state
-       isPerformingIdentification = false
-       timeUntilNextIdentification = nil
-       
-       // Reset LLM
-       llmState = .idle
-       llmManager.isGenerating = false
-       llmManager.errorMessage = nil
-       llmManager.currentPrompts = []
-   }
-   
-   // Method to reset state
-   func resetState() {
-       print("RecognitionViewModel: Resetting state")
-       
-       // Reset state variables
-       isListening = false
-       isPerformingIdentification = false
-       timeUntilNextIdentification = nil
-       latestTrack = nil
-       
-       // Stop recognition timer
-       identificationTimer?.invalidate()
-       identificationTimer = nil
-       
-       // Reset LLM
-       llmState = .idle
-       llmManager.isGenerating = false
-       llmManager.errorMessage = nil
-       llmManager.currentPrompts = []
-   }
-   
-   // Method to send test track info
-   func sendTestTrackInfo(track: TrackInfo) async {
-       print("RecognitionViewModel: Sending test track information")
-       
-       // Update current track
-       latestTrack = track
-       
-       // Send track information
-       await sendTrackInfo(track: track)
-   }
+  // Add a method to handle LLM states
+  public func handleLLMState() {
+      Task { @MainActor in
+          // Check if LLM is generating
+          if llmManager.isGenerating {
+              print("RecognitionViewModel: Generating prompts in progress...")
+              llmState = .generating
+              return
+          }
+          
+          // Check if there's an error
+          if let error = llmManager.errorMessage {
+              print("RecognitionViewModel: Error during prompts generation: \(error)")
+              llmState = .error(error)
+              return
+          }
+          
+          // Check if prompts are available
+          let prompts = llmManager.currentPrompts
+          if !prompts.isEmpty {
+              print("RecognitionViewModel: \(prompts.count) prompts generated successfully!")
+              
+              // Update prompts in latestTrack
+              if var track = latestTrack {
+                  for (index, prompt) in prompts.enumerated() {
+                      switch index {
+                      case 0: track.prompt1 = prompt.prompt
+                      case 1: track.prompt2 = prompt.prompt
+                      case 2: track.prompt3 = prompt.prompt
+                      case 3: track.prompt4 = prompt.prompt
+                      case 4: track.prompt5 = prompt.prompt
+                      case 5: track.prompt6 = prompt.prompt
+                      case 6: track.prompt7 = prompt.prompt
+                      case 7: track.prompt8 = prompt.prompt
+                      case 8: track.prompt9 = prompt.prompt
+                      case 9: track.prompt10 = prompt.prompt
+                      default: break
+                      }
+                  }
+                  latestTrack = track
+                  
+                  // Send updated information via OSC
+                  await sendTrackInfo(track: track)
+              }
+              
+              llmState = .success(prompts)
+              return
+          }
+          
+          // Default to idle
+          print("RecognitionViewModel: LLM state: idle")
+          llmState = .idle
+      }
+  }
+
+  // Method to cancel ongoing identification
+  func cancelIdentification() {
+      print("RecognitionViewModel: Cancelling ongoing identification")
+      isListening = false // Ensure listening stops
+      musicRecognizer?.cancel() // Cancel via protocol
+      audioManager.cancelRecording() // Explicitly cancel recording too
+      stopIdentificationTimer()
+      stopDisplayTimer()
+      isPerformingIdentification = false
+      timeUntilNextIdentification = nil
+      llmState = .idle
+      // Reset LLM Manager state if needed
+      // llmManager.reset()
+      statusMessage = "Identification cancelled."
+  }
+  
+  // Method to reset state
+  func resetState() {
+      print("RecognitionViewModel: Resetting state")
+      
+      // Reset state variables
+      isListening = false
+      isPerformingIdentification = false
+      timeUntilNextIdentification = nil
+      latestTrack = nil
+      
+      // Stop recognition timer
+      identificationTimer?.invalidate()
+      identificationTimer = nil
+      
+      // Reset LLM
+      llmState = .idle
+      llmManager.isGenerating = false
+      llmManager.errorMessage = nil
+      llmManager.currentPrompts = []
+  }
+  
+  // Method to send test track info
+  func sendTestTrackInfo(track: TrackInfo) async {
+      print("RecognitionViewModel: Sending test track information")
+      
+      // Update current track
+      latestTrack = track
+      
+      // Send track information
+      await sendTrackInfo(track: track)
+  }
 
 } // End of RecognitionViewModel class
+
+// Make TrackInfo's source Codable if needed (check if TrackInfo is actually saved)
+// Add CodingKeys if necessary

@@ -47,25 +47,34 @@ class SettingsManager: ObservableObject {
         static let selectedLLM = "selectedLLM"
         static let llmSystemPrompt = "llmSystemPrompt"
         static let deviceIPAddress = "deviceIPAddress"
+        static let musicIDProvider = "musicIDProvider"
         
         // Keychain keys
-        static let audDAPIKey = "audDAPIKey"
+        static let auddAPIKey = "auddAPIKey"
+        static let acrHost = "acrHost"
+        static let acrAccessKey = "acrAccessKey"
+        static let acrSecretKey = "acrSecretKey"
         static let deepseekAPIKey = "deepseekAPIKey"
         static let geminiAPIKey = "geminiAPIKey"
-        static let claudeAPIKey = "claudeAPIKey"
+        static let groqAPIKey = "groqAPIKey"
         static let chatGPTAPIKey = "chatGPTAPIKey"
     }
     
     // MARK: - Keychain configuration
-    private let keychain = Keychain(service: "com.studiocarlos.vibeid")
+    private let keychain = Keychain(service: "studio.carlos.vibeid")
 
     // Default values
     private let defaultOSCHost = "127.0.0.1"
     private let defaultOSCPort = 8000
     private let defaultOscListenPort = 9000
     private let defaultRecognitionFrequencyMinutes = 5
-    private let defaultAudDAPIKey = ""
+    private let defaultAuddAPIKey = ""
+    private let defaultAcrHost = "identify-eu-west-1.acrcloud.com"
+    private let defaultAcrAccessKey = ""
+    private let defaultAcrSecretKey = ""
     private let defaultDeepSeekAPIKey = ""
+    private let defaultGroqAPIKey = ""
+    private let defaultMusicIDProvider: MusicIDProvider = .acrCloud
     
     // Default system prompt
     private let defaultSystemPrompt = """
@@ -157,40 +166,85 @@ Focus on:
             saveToUserDefaults(Keys.recognitionFrequencyMinutes, recognitionFrequencyMinutes)
         }
     }
-    @Published var apiKey: String? {
+    
+    // Music ID Provider Selection
+    @Published var musicIDProvider: MusicIDProvider {
         didSet {
-            saveToKeychain(Keys.audDAPIKey, apiKey)
+            saveToUserDefaults(Keys.musicIDProvider, musicIDProvider.rawValue)
         }
     }
+    
+    // AudD API Key (Secret - Keychain)
+    @Published var auddAPIKey: String {
+        didSet {
+            // Redact key in logs
+            print("SettingsManager: AudD Key did set (value redacted)")
+            saveToKeychain(Keys.auddAPIKey, auddAPIKey)
+        }
+    }
+    
+    // ACRCloud Host (Secret - Keychain)
+    @Published var acrHost: String {
+         didSet {
+             // Okay to log host
+             print("SettingsManager: ACR Host did set to \(acrHost)")
+             saveToKeychain(Keys.acrHost, acrHost)
+         }
+     }
+    
+    // ACRCloud Access Key (Secret - Keychain)
+    @Published var acrAccessKey: String {
+         didSet {
+             print("SettingsManager: ACR Access Key did set (value redacted)")
+             saveToKeychain(Keys.acrAccessKey, acrAccessKey)
+         }
+     }
+     
+    // ACRCloud Secret Key (Secret - Keychain)
+    @Published var acrSecretKey: String {
+         didSet {
+             print("SettingsManager: ACR Secret Key did set (value redacted)")
+             saveToKeychain(Keys.acrSecretKey, acrSecretKey)
+         }
+     }
+    
+    // LLM Selection
     @Published var selectedLLM: LLMType {
         didSet {
             saveToUserDefaults(Keys.selectedLLM, selectedLLM.rawValue)
         }
     }
+    
+    // LLM API Keys (Secrets - Keychain)
     @Published var deepseekAPIKey: String {
         didSet {
+            print("SettingsManager: Deepseek Key did set (value redacted)")
             saveToKeychain(Keys.deepseekAPIKey, deepseekAPIKey)
         }
     }
     @Published var geminiAPIKey: String {
         didSet {
+            print("SettingsManager: Gemini Key did set (value redacted)")
             saveToKeychain(Keys.geminiAPIKey, geminiAPIKey)
         }
     }
-    @Published var claudeAPIKey: String {
+    @Published var groqAPIKey: String {
         didSet {
-            saveToKeychain(Keys.claudeAPIKey, claudeAPIKey)
+            print("SettingsManager: Groq Key did set (value redacted)")
+            saveToKeychain(Keys.groqAPIKey, groqAPIKey)
         }
     }
     @Published var chatGPTAPIKey: String {
         didSet {
+            print("SettingsManager: ChatGPT Key did set (value redacted)")
             saveToKeychain(Keys.chatGPTAPIKey, chatGPTAPIKey)
         }
     }
+    
+    // LLM System Prompt
     @Published var llmSystemPrompt: String {
         didSet {
             if llmSystemPrompt.isEmpty {
-                // Reset to default prompt if empty
                 llmSystemPrompt = defaultSystemPrompt
             }
             saveToUserDefaults(Keys.llmSystemPrompt, llmSystemPrompt)
@@ -212,17 +266,25 @@ Focus on:
         oscListenPort = defaultOscListenPort
         isOscInputEnabled = false
         recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
+        musicIDProvider = defaultMusicIDProvider
+        auddAPIKey = defaultAuddAPIKey
+        acrHost = defaultAcrHost
+        acrAccessKey = defaultAcrAccessKey
+        acrSecretKey = defaultAcrSecretKey
         selectedLLM = .deepseek
-        apiKey = nil
         deepseekAPIKey = defaultDeepSeekAPIKey
         geminiAPIKey = ""
-        claudeAPIKey = ""
+        groqAPIKey = defaultGroqAPIKey
         chatGPTAPIKey = ""
         llmSystemPrompt = defaultSystemPrompt
         
         // Now that all properties are initialized, load values from persistent storage
         loadSavedValues()
         
+        // Inject ACRCloud credentials from prompt if keychain is empty
+        // Important: Do this *after* loadSavedValues
+        injectInitialACRCredentials()
+
         // Update device IP address
         Task {
             await updateDeviceIPAddress()
@@ -240,6 +302,14 @@ Focus on:
         isOscInputEnabled = defaults.bool(forKey: Keys.isOscInputEnabled)
         recognitionFrequencyMinutes = defaults.integer(forKey: Keys.recognitionFrequencyMinutes) > 0 ? defaults.integer(forKey: Keys.recognitionFrequencyMinutes) : defaultRecognitionFrequencyMinutes
         
+        // Load Music ID Provider
+        if let providerString = defaults.string(forKey: Keys.musicIDProvider),
+           let provider = MusicIDProvider(rawValue: providerString) {
+            musicIDProvider = provider
+        } else {
+             musicIDProvider = defaultMusicIDProvider // Ensure default if not set
+        }
+        
         // Load LLM type from UserDefaults
         if let llmTypeString = defaults.string(forKey: Keys.selectedLLM),
            let llmType = LLMType(rawValue: llmTypeString) {
@@ -250,13 +320,58 @@ Focus on:
         llmSystemPrompt = defaults.string(forKey: Keys.llmSystemPrompt) ?? defaultSystemPrompt
         
         // Load API keys from Keychain
-        apiKey = loadFromKeychain(Keys.audDAPIKey)
+        auddAPIKey = loadFromKeychain(Keys.auddAPIKey) ?? defaultAuddAPIKey
+        acrHost = loadFromKeychain(Keys.acrHost) ?? defaultAcrHost
+        acrAccessKey = loadFromKeychain(Keys.acrAccessKey) ?? defaultAcrAccessKey
+        acrSecretKey = loadFromKeychain(Keys.acrSecretKey) ?? defaultAcrSecretKey
         deepseekAPIKey = loadFromKeychain(Keys.deepseekAPIKey) ?? defaultDeepSeekAPIKey
         geminiAPIKey = loadFromKeychain(Keys.geminiAPIKey) ?? ""
-        claudeAPIKey = loadFromKeychain(Keys.claudeAPIKey) ?? ""
+        groqAPIKey = loadFromKeychain(Keys.groqAPIKey) ?? defaultGroqAPIKey
         chatGPTAPIKey = loadFromKeychain(Keys.chatGPTAPIKey) ?? ""
+        
+        print("SettingsManager: Loaded saved values.")
+        // Redact keys when printing loaded values
+        print("  - Music Provider: \(musicIDProvider.displayName)")
+        print("  - AudD Key Loaded: \(!auddAPIKey.isEmpty)")
+        print("  - ACR Host: \(acrHost)")
+        print("  - ACR Access Key Loaded: \(!acrAccessKey.isEmpty)")
+        print("  - ACR Secret Key Loaded: \(!acrSecretKey.isEmpty)")
+        print("  - Selected LLM: \(selectedLLM.displayName)")
     }
     
+    // Inject initial ACR credentials if they are not already set in Keychain
+    private func injectInitialACRCredentials() {
+        let hostInKeychain = loadFromKeychain(Keys.acrHost)
+        let keyInKeychain = loadFromKeychain(Keys.acrAccessKey)
+        let secretInKeychain = loadFromKeychain(Keys.acrSecretKey)
+        
+        // Only inject if *all* ACR keychain entries are currently empty/nil
+        if (hostInKeychain == nil || hostInKeychain?.isEmpty == true) &&
+           (keyInKeychain == nil || keyInKeychain?.isEmpty == true) &&
+           (secretInKeychain == nil || secretInKeychain?.isEmpty == true) {
+            
+            print("SettingsManager: Keychain empty for ACR, injecting credentials from prompt...")
+            // Use values provided in the initial prompt
+            let initialHost = "identify-eu-west-1.acrcloud.com"
+            let initialKey = "1c5f463140cd1c69c1adb13021391edd"
+            let initialSecret = "Os7kP4TanetTwe8gTknibpA5glX4Qi9Zh9xqrDTU"
+            
+            saveToKeychain(Keys.acrHost, initialHost)
+            saveToKeychain(Keys.acrAccessKey, initialKey)
+            saveToKeychain(Keys.acrSecretKey, initialSecret)
+            
+            // Update the @Published properties to reflect the injection
+            // This ensures the UI shows the injected values immediately
+            self.acrHost = initialHost
+            self.acrAccessKey = initialKey
+            self.acrSecretKey = initialSecret
+            
+            print("SettingsManager: ACR Credentials Injected.")
+        } else {
+            print("SettingsManager: ACR Credentials already exist in Keychain, skipping injection.")
+        }
+    }
+
     // MARK: - Persistence methods
     
     /// Save a value to UserDefaults
@@ -266,21 +381,33 @@ Focus on:
     
     /// Save a string value to Keychain
     private func saveToKeychain(_ key: String, _ value: String?) {
-        do {
-            if let value = value {
-                if value.isEmpty {
-                    // If the string is empty, remove the key from the keychain
-                    try keychain.remove(key)
-                } else {
-                    // Otherwise save the value
-                    try keychain.set(value, key: key)
-                }
-            } else {
-                // If the value is nil, also remove the key
+        guard let valueToSave = value, !valueToSave.isEmpty else {
+            // If value is nil or empty, remove the key
+            do {
                 try keychain.remove(key)
+                print("SettingsManager: Removed '\(key)' from keychain.")
+            } catch {
+                // Log error only if it's not a 'not found' error during removal
+                if let keychainError = error as? KeychainAccess.Status, keychainError != .itemNotFound {
+                     print("SettingsManager: Error removing '\(key)' from keychain: \(error.localizedDescription)")
+                } else if !(error is KeychainAccess.Status) {
+                     print("SettingsManager: Error removing '\(key)' from keychain: \(error.localizedDescription)")
+                }
+            }
+            return
+        }
+
+        // Save the non-empty value
+        do {
+            try keychain.set(valueToSave, key: key)
+            // Avoid logging sensitive keys directly
+            if key == Keys.acrHost { // Host is okay to log
+                 print("SettingsManager: Saved '\(key)' = \(valueToSave) to keychain.")
+            } else {
+                 print("SettingsManager: Saved '\(key)' (value redacted) to keychain.")
             }
         } catch {
-            print("Error saving to keychain: \(error.localizedDescription)")
+            print("SettingsManager: Error saving '\(key)' to keychain: \(error.localizedDescription)")
         }
     }
     
@@ -288,19 +415,49 @@ Focus on:
     private func loadFromKeychain(_ key: String) -> String? {
         do {
             let value = try keychain.getString(key)
+            // Avoid logging sensitive keys directly
+//            if let retrievedValue = value {
+//                if key == Keys.acrHost { // Host okay to log
+//                    print("SettingsManager: Loaded '\(key)' = \(retrievedValue) from keychain.")
+//                } else {
+//                    print("SettingsManager: Loaded '\(key)' (value redacted) from keychain.")
+//                }
+//            } else {
+//                print("SettingsManager: No value found for '\(key)' in keychain.")
+//            }
             return value
-        } catch {
-            print("Error loading from keychain: \(error.localizedDescription)")
+        } catch let error {
+            // Don't log 'itemNotFound' as an error, it's expected
+            if let keychainError = error as? KeychainAccess.Status, keychainError == .itemNotFound {
+                // print("SettingsManager: Key '\(key)' not found in keychain (normal)." )
+                return nil
+            }
+            // Log other keychain errors
+            print("SettingsManager: Error loading '\(key)' from keychain: \(error.localizedDescription)")
             return nil
         }
     }
     
     // MARK: - Public methods
     
+    // Returns true if the app has a valid API key configured for the *selected* provider
+    var hasValidMusicIDKeys: Bool {
+        switch musicIDProvider {
+        case .audd:
+            return !auddAPIKey.isEmpty
+        case .acrCloud:
+            return !acrHost.isEmpty && !acrAccessKey.isEmpty && !acrSecretKey.isEmpty
+        }
+    }
+    
+    // Convenience getter for ACR Credentials struct
+    var acrCreds: ACRCreds {
+        return ACRCreds(host: acrHost, key: acrAccessKey, secret: acrSecretKey)
+    }
+    
     // Returns true if the app has a valid API key configured
     var hasValidAPIKey: Bool {
-        guard let key = apiKey else { return false }
-        return !key.isEmpty
+        return hasValidLLMConfig
     }
     
     // Returns true if OSC configuration is valid
@@ -320,23 +477,31 @@ Focus on:
         oscListenPort = defaultOscListenPort
         isOscInputEnabled = false
         recognitionFrequencyMinutes = defaultRecognitionFrequencyMinutes
+        musicIDProvider = defaultMusicIDProvider
         selectedLLM = .deepseek
+        llmSystemPrompt = defaultSystemPrompt
         
         // Clear API keys in keychain
-        saveToKeychain(Keys.audDAPIKey, nil)
+        saveToKeychain(Keys.auddAPIKey, nil)
+        saveToKeychain(Keys.acrHost, nil)
+        saveToKeychain(Keys.acrAccessKey, nil)
+        saveToKeychain(Keys.acrSecretKey, nil)
         saveToKeychain(Keys.deepseekAPIKey, defaultDeepSeekAPIKey)
         saveToKeychain(Keys.geminiAPIKey, nil)
-        saveToKeychain(Keys.claudeAPIKey, nil)
+        saveToKeychain(Keys.groqAPIKey, nil)
         saveToKeychain(Keys.chatGPTAPIKey, nil)
         
         // Update published properties to reflect keychain changes
-        apiKey = nil
+        auddAPIKey = defaultAuddAPIKey
+        acrHost = defaultAcrHost
+        acrAccessKey = defaultAcrAccessKey
+        acrSecretKey = defaultAcrSecretKey
         deepseekAPIKey = defaultDeepSeekAPIKey
         geminiAPIKey = ""
-        claudeAPIKey = ""
+        groqAPIKey = ""
         chatGPTAPIKey = ""
         
-        llmSystemPrompt = defaultSystemPrompt
+        print("SettingsManager: Reset all settings to defaults.")
     }
 
     /// Resets the LLM system prompt to default, but only if current prompt is not empty
@@ -359,8 +524,8 @@ Focus on:
             return deepseekAPIKey
         case .gemini:
             return geminiAPIKey
-        case .claude:
-            return claudeAPIKey
+        case .groq:
+            return groqAPIKey
         case .chatGPT:
             return chatGPTAPIKey
         }
@@ -463,4 +628,16 @@ enum RecognitionMode: String, CaseIterable, Identifiable {
 extension Notification.Name {
     static let oscInputSettingsChanged = Notification.Name("oscInputSettingsChanged")
     static let oscReceiveSettingChanged = Notification.Name("oscReceiveSettingChanged")
+}
+
+// Add this extension to LLMType to provide displayName property
+extension LLMType {
+    var displayName: String {
+        switch self {
+        case .deepseek: return "DeepSeek"
+        case .groq: return "Groq"
+        case .gemini: return "Gemini"
+        case .chatGPT: return "ChatGPT"
+        }
+    }
 }

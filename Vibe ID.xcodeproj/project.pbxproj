@@ -12,8 +12,22 @@
 		07199AD52DA15746003C862C /* OSCKitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 07199AD42DA15746003C862C /* OSCKitCore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		07B72F0A2DC77EB400C41B4C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		07199AAC2DA13B06003C862C /* Vibe ID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe ID.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		07B72F0C2DC77F1600C41B4C /* Vibe_ID-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vibe_ID-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -26,11 +40,25 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		07B72F0B2DC77EB400C41B4C /* Exceptions for "Vibe ID" folder in "Embed Frameworks" phase from "Vibe ID" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			attributesByRelativePath = {
+				ACRCloudiOSSDK.framework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
+			};
+			buildPhase = 07B72F0A2DC77EB400C41B4C /* Embed Frameworks */;
+			membershipExceptions = (
+				ACRCloudiOSSDK.framework,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07199AAE2DA13B06003C862C /* Vibe ID */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				07CB0B0D2DA6781100D30D44 /* Exceptions for "Vibe ID" folder in "Vibe ID" target */,
+				07B72F0B2DC77EB400C41B4C /* Exceptions for "Vibe ID" folder in "Embed Frameworks" phase from "Vibe ID" target */,
 			);
 			path = "Vibe ID";
 			sourceTree = "<group>";
@@ -56,6 +84,7 @@
 			children = (
 				07199AAE2DA13B06003C862C /* Vibe ID */,
 				07199AAD2DA13B06003C862C /* Products */,
+				07B72F0C2DC77F1600C41B4C /* Vibe_ID-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -77,6 +106,7 @@
 				07199AA82DA13B06003C862C /* Sources */,
 				07199AA92DA13B06003C862C /* Frameworks */,
 				07199AAA2DA13B06003C862C /* Resources */,
+				07B72F0A2DC77EB400C41B4C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -284,11 +314,17 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PGLVYH2292;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Vibe\\ ID",
+					"\"$(PROJECT_DIR)/Vibe ID/ACRCloudiOSSDK.xcframework/ios-arm64\"/**",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Vibe ID/Vibe-ID-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Vibe ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Track ID";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Vibe ID uses the local network to send OSC messages to your software (like Chataigne)";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Vibe ID needs access to the microphone to identify music playing nearby.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -303,6 +339,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "fr.studiocarlos.Vibe-ID";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Vibe_ID-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -317,11 +354,17 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PGLVYH2292;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Vibe\\ ID",
+					"\"$(PROJECT_DIR)/Vibe ID/ACRCloudiOSSDK.xcframework/ios-arm64\"/**",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Vibe ID/Vibe-ID-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Vibe ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Track ID";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Vibe ID uses the local network to send OSC messages to your software (like Chataigne)";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Vibe ID needs access to the microphone to identify music playing nearby.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -336,6 +379,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "fr.studiocarlos.Vibe-ID";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Vibe_ID-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

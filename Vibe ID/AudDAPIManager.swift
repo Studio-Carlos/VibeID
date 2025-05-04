@@ -263,3 +263,43 @@ class AudDAPIManager {
     }
 
 } // End of AudDAPIManager class
+
+// Extend AudDAPIManager to conform to MusicRecognizer protocol
+extension AudDAPIManager: MusicRecognizer {
+    
+    // NOTE: The original AudDAPIManager uses a file-based approach.
+    // The protocol requires identifying ambient sound. This implementation
+    // will need to be significantly adapted or replaced with one that uses
+    // live audio recording and the AudD streaming/recording API if available.
+    // For now, this is a placeholder demonstrating conformance.
+    // It currently throws an error indicating it's not implemented for live audio.
+    func identify(seconds: Int) async throws -> RecognizedTrack? {
+        print("AudDAPIManager: identify(seconds:) called. Current implementation expects a file URL.")
+        // Throw an error indicating this specific method (live recording) isn't implemented
+        // You would need to integrate audio recording (e.g., using AVAudioEngine)
+        // and potentially use a different AudD API endpoint if they support live streaming/chunked data.
+        throw AudDAPIError.apiError(message: "AudD live audio recognition not implemented in this adapter.", code: nil)
+        
+        // --- Hypothetical future implementation using a temporary file ---
+        // 1. Record audio for `seconds` duration to a temporary file.
+        // let tempFileURL = try await recordAudio(duration: seconds)
+        //
+        // 2. Call the existing file-based recognition.
+        // guard let apiKey = SettingsManager.shared.apiKey else { // Need access to the key
+        //     throw AudDAPIError.apiError(message: "AudD API Key not configured", code: nil)
+        // }
+        // let auddResult = try await recognizeAsync(audioFileURL: tempFileURL, apiKey: apiKey)
+        //
+        // 3. Clean up temporary file.
+        // try? FileManager.default.removeItem(at: tempFileURL)
+        //
+        // 4. Map to RecognizedTrack.
+        // return RecognizedTrack(audDResult: auddResult)
+        // -------------------------------------------------------------
+    }
+
+    // Existing cancel method already fits the protocol requirement.
+    func cancel() {
+        self.cancelRequest()
+    }
+}

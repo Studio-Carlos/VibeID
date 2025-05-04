@@ -23,6 +23,7 @@ import Foundation // Import Foundation for URL
 enum TrackSource {
     case audD   // Source: API AudD
     case osc    // Source: External OSC messages
+    case acrCloud // Source: acrCloud
 }
 
 // Model for track information
