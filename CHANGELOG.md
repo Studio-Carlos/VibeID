@@ -33,3 +33,40 @@
 
 ### Corrigé
 - Divers correctifs de bugs et améliorations de stabilité. 
+
+---
+
+# Previous Versions
+
+## [2.0] - 2025-04-10
+- Major update with multi-LLM prompt generation (DeepSeek, Gemini, ChatGPT, Claude)
+- OSC input support for track info
+- UI improvements and bilingual documentation
+
+## [1.2] - 2025-04-09
+- Add LLM image prompt generation
+- Improve OSC communication
+- Enhance UI
+
+## [1.1] - 2025-04-07
+- Enhanced UI with DJ/VJ-oriented design improvements
+- Nouvelle interface utilisateur plus élégante (Français)
+
+## [1.0] - 2025-04-07
+- First stable release with complete functionality
+- Fully functional music identification via AudD API
+- Complete OSC message sending implemented
+- Clean SwiftUI interface with settings panel
+- English localization throughout the application
+- GNU GPL V3 License added
+- Code documentation and structure improved for open source release
+
+## [0.2] - 2025-04-06
+- Resolve button action and enable identification flow
+
+## [0.1] - 2025-04-05
+- Initial functional version
+
+---
+
+*For full commit-level details, see the project git history.* 

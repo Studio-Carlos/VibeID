@@ -26,7 +26,7 @@
 
 ### AI Visual Prompt Generation with Multi-LLM
 - **Advanced LLM Integration:** Automatically generates 10 creative image prompts for each identified track.
-- **Multi-LLM Support:** Choose your preferred LLM in settings from **Deepseek, Groq (tested, works well), Gemini, and ChatGPT (via OpenAI API)**. *(Note: Groq and DeepSeek are tested; Gemini and ChatGPT are implemented but not tested in this version).*
+- **Multi-LLM Support:** Choose your preferred LLM in settings from **Deepseek, Groq, Gemini, and ChatGPT (via OpenAI API)**. *(Note: Groq and DeepSeek are tested; Gemini and ChatGPT are implemented but not tested in this version).*
 - **Dedicated Configuration:** Enter your personal API keys for each LLM service in settings (secure storage).
 - **Customizable System Prompt:** Guide the AI with your own "System Prompt" (modifiable in settings) to direct the style or content of generated prompts. The AI uses track information and potentially its own knowledge/web research to create prompts.
 - **Integrated Display:** The 10 generated prompts are displayed at the bottom of the main screen in a navigable carousel.

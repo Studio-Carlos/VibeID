@@ -68,12 +68,12 @@ class SettingsManager: ObservableObject {
     private let defaultOSCPort = 8000
     private let defaultOscListenPort = 9000
     private let defaultRecognitionFrequencyMinutes = 5
-    private let defaultAuddAPIKey = ""
+    private let defaultAuddAPIKey = "Enter your AudD API Key"
     private let defaultAcrHost = "identify-eu-west-1.acrcloud.com"
-    private let defaultAcrAccessKey = ""
-    private let defaultAcrSecretKey = ""
-    private let defaultDeepSeekAPIKey = ""
-    private let defaultGroqAPIKey = ""
+    private let defaultAcrAccessKey = "Enter your ACRCloud Access Key"
+    private let defaultAcrSecretKey = "Enter your ACRCloud Secret Key"
+    private let defaultDeepSeekAPIKey = "Enter your DeepSeek API Key"
+    private let defaultGroqAPIKey = "Enter your Groq API Key"
     private let defaultMusicIDProvider: MusicIDProvider = .acrCloud
     
     // Default system prompt
